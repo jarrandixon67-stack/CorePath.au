@@ -13,13 +13,15 @@
 - [x] Typed environment configuration.
 - [x] Optional PostgreSQL connection pool.
 - [x] Liveness and database-readiness endpoints.
-- [x] Initial API health tests.
+- [x] Health endpoint tests, including configured and unconfigured database cases.
 - [x] Dockerfile and local development documentation.
+- [x] GitHub Actions workflow for PostgreSQL migration validation, specialist seed-count checks, backend tests and linting.
 
 ## Not yet verified
 
-- [ ] Python dependency installation and automated tests executed.
-- [ ] SQL migration applied successfully to a disposable PostgreSQL instance.
+- [ ] GitHub Actions workflow has completed successfully.
+- [ ] Python dependency installation and automated tests executed in CI.
+- [ ] SQL migration applied successfully to the CI PostgreSQL service.
 - [ ] Migration tested against the selected managed PostgreSQL service/version.
 - [ ] Cloud provider, region and operating budget selected.
 - [ ] Database backups and restore procedure tested.
@@ -27,14 +29,13 @@
 
 ## Next implementation sequence
 
-1. Run backend tests and lint in CI.
-2. Validate the SQL migration against a disposable PostgreSQL database.
-3. Add schema migration tracking and deployment procedure.
-4. Implement source registration and library-scoped access.
-5. Implement document ingestion, extraction and section indexing.
-6. Implement hybrid retrieval and provenance-rich results.
-7. Implement evidence assessments and knowledge versioning.
-8. Add Coordinator-authorised cross-specialist research workflows.
+1. Confirm CI is green and correct any issues.
+2. Add schema migration tracking and deployment procedure.
+3. Implement source registration and library-scoped access.
+4. Implement document ingestion, extraction and section indexing.
+5. Implement hybrid retrieval and provenance-rich results.
+6. Implement evidence assessments and knowledge versioning.
+7. Add Coordinator-authorised cross-specialist research workflows.
 
 ## Important boundary
 
