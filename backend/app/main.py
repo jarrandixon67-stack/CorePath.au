@@ -14,6 +14,8 @@ from app.source_service import (
     list_libraries,
     list_library_sources,
     register_library_source,
+    link_existing_source,
+    SourceNotFoundError,
 )
 
 
@@ -118,5 +120,28 @@ def create_library_source(
         return register_library_source(pool, library_id, source)
     except LibraryNotFoundError as exc:
         raise HTTPException(status_code=404, detail="Knowledge library not found") from exc
+    except (OperationalError, PoolTimeout, TimeoutError) as exc:
+        raise HTTPException(status_code=503, detail="Database is unavailable") from exc
+
+
+
+@app.put(
+    "/v1/libraries/{library_id}/sources/{source_id}",
+    tags=["knowledge sources"],
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(require_internal_token)],
+)
+def add_existing_source_to_library(
+    library_id: UUID,
+    source_id: UUID,
+    pool=Depends(get_database_pool),
+) -> None:
+    """Associate an existing shared source record with another specialist library."""
+    try:
+        link_existing_source(pool, library_id, source_id)
+    except LibraryNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Knowledge library not found") from exc
+    except SourceNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Knowledge source not found") from exc
     except (OperationalError, PoolTimeout, TimeoutError) as exc:
         raise HTTPException(status_code=503, detail="Database is unavailable") from exc
