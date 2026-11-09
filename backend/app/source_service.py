@@ -114,3 +114,47 @@ def register_library_source(
             (actor, source_id),
         )
         return row
+
+
+def link_existing_source(
+    pool: ConnectionPool,
+    library_id: UUID,
+    source_id: UUID,
+    actor: str = "internal-api",
+) -> None:
+    with pool.connection() as conn:
+        library = conn.execute(
+            "SELECT id FROM knowledge_libraries WHERE id = %s",
+            (library_id,),
+        ).fetchone()
+        if library is None:
+            raise LibraryNotFoundError
+
+        source = conn.execute(
+            "SELECT id FROM knowledge_sources WHERE id = %s",
+            (source_id,),
+        ).fetchone()
+        if source is None:
+            raise SourceNotFoundError
+
+        conn.execute(
+            """
+            INSERT INTO source_library_links (source_id, library_id, added_by)
+            VALUES (%s, %s, %s)
+            ON CONFLICT (source_id, library_id) DO NOTHING
+            """,
+            (source_id, library_id, actor),
+        )
+        conn.execute(
+            """
+            INSERT INTO audit_events
+                (actor_label, action, target_type, target_id, purpose, outcome)
+            VALUES (%s, 'source.link_library', 'knowledge_source', %s,
+                    'Link existing source to specialist library', 'succeeded')
+            """,
+            (actor, source_id),
+        )
+
+
+class SourceNotFoundError(Exception):
+    pass
