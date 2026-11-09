@@ -53,10 +53,11 @@ jobs:
       - name: Apply initial schema migration
         run: |
           PGPASSWORD=corepath-test psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f database/migrations/001_initial_knowledge_schema.sql
+          PGPASSWORD=corepath-test psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f database/migrations/002_source_library_registry.sql
 
       - name: Verify all specialist libraries were seeded
         run: |
-          PGPASSWORD=corepath-test psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c "DO \$\$ BEGIN IF (SELECT count(*) FROM specialist_domains) <> 11 THEN RAISE EXCEPTION 'Expected 11 specialist domains'; END IF; IF (SELECT count(*) FROM knowledge_libraries) <> 11 THEN RAISE EXCEPTION 'Expected 11 specialist libraries'; END IF; END \$\$;"
+          PGPASSWORD=corepath-test psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c "DO \$\$ BEGIN IF (SELECT count(*) FROM specialist_domains) <> 11 THEN RAISE EXCEPTION 'Expected 11 specialist domains'; END IF; IF (SELECT count(*) FROM knowledge_libraries) <> 11 THEN RAISE EXCEPTION 'Expected 11 specialist libraries'; END IF; IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'knowledge_sources' AND column_name = 'source_status') THEN RAISE EXCEPTION 'Expected source_status column from migration 002'; END IF; END \$\$;"
 
       - name: Run backend tests
         working-directory: backend

@@ -15,7 +15,8 @@
 - [x] Liveness and database-readiness endpoints.
 - [x] Health endpoint tests, including configured and unconfigured database cases.
 - [x] Dockerfile and local development documentation.
-- [x] GitHub Actions workflow for PostgreSQL migration validation, specialist seed-count checks, backend tests and linting.
+- [x] GitHub Actions workflow for PostgreSQL migration validation, specialist seed-count checks, backend tests and linting.\n- [x] Source-to-library association migration.\n- [x] Authenticated source registry API: list libraries, list library sources and register source metadata.\n- [x] Initial bearer-token guard and authentication tests.
+- [x] Source records can be associated with multiple specialist libraries without duplicating source metadata.
 
 ## Not yet verified
 
@@ -25,13 +26,13 @@
 - [ ] Migration tested against the selected managed PostgreSQL service/version.
 - [ ] Cloud provider, region and operating budget selected.
 - [ ] Database backups and restore procedure tested.
-- [ ] Authentication and service identity enforcement implemented.
+- [ ] Production per-service identity and scoped permission enforcement implemented.
 
 ## Next implementation sequence
 
 1. Confirm CI is green and correct any issues.
 2. Add schema migration tracking and deployment procedure.
-3. Implement source registration and library-scoped access.
+3. Complete source registry validation, duplicate handling and production service identity controls.
 4. Implement document ingestion, extraction and section indexing.
 5. Implement hybrid retrieval and provenance-rich results.
 6. Implement evidence assessments and knowledge versioning.

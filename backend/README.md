@@ -58,3 +58,25 @@ Copy `.env.example` to `.env` and set a local `DATABASE_URL`. Never commit crede
 ## Current limitations
 
 This is an application foundation only. It does not yet implement source ingestion, research execution, retrieval, specialist authentication or production deployment. Those capabilities are separate subsequent milestones.
+
+
+## Source registry API
+
+Internal source-management routes require an HTTP bearer token configured as
+`INTERNAL_API_TOKEN`. The current shared-token guard is an interim development
+control, not the final per-bot identity and scoped-permission model.
+
+- `GET /v1/libraries` — list the eleven specialist libraries.
+- `GET /v1/libraries/{library_id}/sources` — list registered source metadata.
+- `POST /v1/libraries/{library_id}/sources` — register source metadata.
+
+The POST endpoint registers metadata only; it does not download or ingest a
+book, paper or web page. Source ingestion and licence-aware processing are
+separate subsequent capabilities.
+
+Apply migrations in order to a disposable database:
+
+```bash
+psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f ../database/migrations/001_initial_knowledge_schema.sql
+psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f ../database/migrations/002_source_library_registry.sql
+```
