@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from psycopg.rows import dict_row
+from psycopg.types.json import Jsonb
 from psycopg_pool import ConnectionPool
 
 from app.schemas import SourceCreate
@@ -8,6 +9,20 @@ from app.schemas import SourceCreate
 
 class LibraryNotFoundError(Exception):
     pass
+
+
+def list_libraries(pool: ConnectionPool) -> list[dict]:
+    with pool.connection() as conn:
+        return conn.execute(
+            """
+            SELECT l.id AS library_id, l.name AS library_name, l.status,
+                   d.id AS domain_id, d.slug AS domain_slug, d.name AS domain_name
+            FROM knowledge_libraries AS l
+            JOIN specialist_domains AS d ON d.id = l.domain_id
+            ORDER BY d.name
+            """,
+            row_factory=dict_row,
+        ).fetchall()
 
 
 def list_library_sources(pool: ConnectionPool, library_id: UUID) -> list[dict]:
@@ -19,7 +34,7 @@ def list_library_sources(pool: ConnectionPool, library_id: UUID) -> list[dict]:
         if library is None:
             raise LibraryNotFoundError
 
-        rows = conn.execute(
+        return conn.execute(
             """
             SELECT s.id, s.source_type, s.title, s.authors, s.publisher,
                    s.publication_date, s.canonical_url, s.isbn, s.doi,
@@ -33,7 +48,6 @@ def list_library_sources(pool: ConnectionPool, library_id: UUID) -> list[dict]:
             (library_id,),
             row_factory=dict_row,
         ).fetchall()
-        return rows
 
 
 def register_library_source(
@@ -50,6 +64,9 @@ def register_library_source(
         if library is None:
             raise LibraryNotFoundError
 
+        values = source.model_dump(mode="json", exclude={"relationship_note", "source_metadata"})
+        values["canonical_url"] = str(source.canonical_url) if source.canonical_url else None
+
         created = conn.execute(
             """
             INSERT INTO knowledge_sources (
@@ -60,15 +77,11 @@ def register_library_source(
             VALUES (
                 %(source_type)s, %(title)s, %(authors)s, %(publisher)s,
                 %(publication_date)s, %(canonical_url)s, %(isbn)s, %(doi)s,
-                %(language_code)s, %(licence)s, %(access_notes)s,
-                %(source_metadata)s
+                %(language_code)s, %(licence)s, %(access_notes)s, %(source_metadata)s
             )
             RETURNING id
             """,
-            {
-                **source.model_dump(mode="json", exclude={"relationship_note"}),
-                "canonical_url": str(source.canonical_url) if source.canonical_url else None,
-            },
+            {**values, "source_metadata": Jsonb(source.source_metadata)},
         ).fetchone()
 
         source_id = created[0]
