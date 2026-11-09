@@ -1,0 +1,2 @@
+# CorePath.au
+AI Repository
