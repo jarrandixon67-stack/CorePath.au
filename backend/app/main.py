@@ -11,11 +11,11 @@ from app.schemas import SourceCreate
 from app.security import require_internal_token
 from app.source_service import (
     LibraryNotFoundError,
+    SourceNotFoundError,
+    link_existing_source,
     list_libraries,
     list_library_sources,
     register_library_source,
-    link_existing_source,
-    SourceNotFoundError,
 )
 
 
@@ -78,7 +78,7 @@ def readiness(request: Request) -> dict[str, str]:
     tags=["knowledge sources"],
     dependencies=[Depends(require_internal_token)],
 )
-def get_libraries(pool=Depends(get_database_pool)) -> list[dict]:
+def get_libraries(pool=Depends(get_database_pool)  # noqa: B008) -> list[dict]:
     """List specialist libraries available to the authenticated internal caller."""
     try:
         return list_libraries(pool)
