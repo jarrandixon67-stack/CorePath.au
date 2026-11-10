@@ -33,16 +33,23 @@ Use the [CI workflow](../../.github/workflows/knowledge-infrastructure-ci.yml) a
 - [x] Founder and Executive Administrator hierarchy added to the role schema.
 - [x] Executive Administrator role constrained to a global human principal.
 - [x] CI applies and validates the Executive Administrator migration.
+- [x] Explicit migration runner with version/checksum history, advisory locking and transactional batch application.
+- [x] Read-only pending-migration check and repeat-application CI checks.
+- [x] Migration regression tests and documented deployment/recovery procedure.
 
 ## Verification evidence
 
-The [main-branch baseline run](https://github.com/jarrandixon67-stack/CorePath.au/actions/runs/42833588499) for commit `357f936ad34e3382df9f835aeabce74de90ff061` installed dependencies, applied all five migrations, validated seed records and passed all eight backend tests. The overall run failed its lint step on an import-formatting issue in `app/schemas.py`. These results establish test-database behaviour, not production readiness.
+The [cleanup merge run](https://github.com/jarrandixon67-stack/CorePath.au/actions/runs/42862635494) for commit `59ffc7006079e364b055300f1bcf19587ab2084a` passed. Its [PR run](https://github.com/jarrandixon67-stack/CorePath.au/actions/runs/42862486204) verified all eight original backend tests, all five original migrations, specialist seed data, lint and formatting.
 
-- [x] Python dependencies installed and automated tests executed in the baseline CI run.
-- [x] All five migrations applied successfully to the CI PostgreSQL 16 service.
-- [ ] Confirm a successful complete CI run for the release commit, including lint and formatting.
+The continuation brings forward the existing permissions foundation and migration 006 from `feature/knowledge-infrastructure-foundation` at commit `584b824aa954e10d5ea19cbe2c91436c960ca346`. Its [CI run](https://github.com/jarrandixon67-stack/CorePath.au/actions/runs/42839462104) passed before integration. The integrated policy also tests Coordinator-only task dispatch, malformed global-role scopes and revoked grants.
+
+The migration-tracking continuation adds tests for repeat application, read-only pending checks, failed-batch rollback, changed/missing history and untracked-data preservation. Check the exact continuation commit's CI result to verify those additions; the earlier baseline does not establish their success or production readiness.
+
+- [x] Full CI passed for the cleanup merge, including migrations, tests, lint and formatting.
+- [ ] Verify the migration-tracking release commit's full CI result and selected managed PostgreSQL service/version before deployment.
 
 ## Not yet verified or implemented
+
 - [ ] Migration tested against the selected managed PostgreSQL service/version.
 - [ ] Cloud provider, region and operating budget selected.
 - [ ] Database backups and restore procedure tested.
@@ -53,16 +60,16 @@ The [main-branch baseline run](https://github.com/jarrandixon67-stack/CorePath.a
 
 ## Next implementation sequence
 
-1. Confirm CI is green and correct any issues.
-2. Add schema migration tracking and deployment procedure.
-3. Implement secure administrator authentication and server-side session handling; choose identity provider before deployment.
-4. Implement action-level authorisation for founder and administrator roles, then library-scoped researcher access.
-5. Connect Intelligence Centre through a server-side API proxy; remove hardcoded demonstration data.
-6. Complete source registry validation and duplicate handling.
-7. Implement document ingestion, extraction and section indexing.
-8. Implement hybrid retrieval and provenance-rich results.
-9. Implement evidence assessments and knowledge versioning.
-10. Add Coordinator-authorised cross-specialist research workflows.
+The migration-tracking milestone and [deployment procedure](deployment.md) are implemented in this continuation. The [build handover](../HANDOVER.md) records the wider direction and remaining decisions.
+
+1. Implement secure administrator authentication and server-side session handling; choose identity provider before deployment.
+2. Implement action-level authorisation for founder and administrator roles, then library-scoped researcher access.
+3. Connect Intelligence Centre through a server-side API proxy; remove hardcoded demonstration data.
+4. Complete source registry validation and duplicate handling.
+5. Implement document ingestion, extraction and section indexing.
+6. Implement hybrid retrieval and provenance-rich results.
+7. Implement evidence assessments and knowledge versioning.
+8. Add Coordinator-authorised cross-specialist research workflows.
 
 ## Important boundary
 
@@ -75,4 +82,23 @@ Repository commits are not equivalent to deployed infrastructure. No production 
 - [x] Action-level permission boundaries documented separately from role names.
 - [x] Life Profile and Coordinator/specialist orchestration boundaries explicitly excluded from automatic Executive Administrator access.
 
-**Next implementation work:** implement a permission catalogue and role-grant checks in the API; add tests proving that each role can perform only its permitted actions and library scopes. Keep the shared bearer token as a temporary development-only guard until a trusted identity provider and server-side session are in place.
+**Next implementation work:** connect trusted identity, load principal/role/action grants from PostgreSQL, and enforce the existing policy at API endpoints with allow/deny tests. Keep the shared bearer token as a temporary development-only guard until a trusted identity provider and server-side session are in place.
+
+
+## Action-level authorisation foundation
+
+- [x] Deny-by-default policy evaluator for active principals and active role grants.
+- [x] Founder and Executive Administrator permission boundaries.
+- [x] Explicit action grants for administrators, with optional library scope.
+- [x] Specialist researcher and specialist AI library isolation.
+- [x] Coordinator-only specialist task dispatch permissions.
+- [x] Explicit denial of Life Profile access through the knowledge API permission catalogue.
+- [x] PostgreSQL migration for revocable administrator action grants.
+- [x] Unit tests for role boundaries and library scope.
+- [x] Database integration tests for grant constraints.
+- [ ] Trusted identity provider and secure server-side sessions.
+- [ ] Load authenticated principals and grants from PostgreSQL.
+- [ ] Apply permission dependencies to every protected API route.
+- [ ] Add endpoint-level allow/deny tests for each role and action.
+
+**Boundary:** The policy evaluator is a tested foundation, not yet active HTTP route enforcement. The current shared bearer token does not identify a human or AI principal. Do not expose the internal-token API as a production user-facing service until identity and per-request authorisation are connected.

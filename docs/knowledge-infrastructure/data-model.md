@@ -31,6 +31,7 @@
 | access_permissions | Domain and action permission records for service identities |
 | access_principals | Registry of human and AI service identities |
 | access_role_assignments | Global or library-scoped role assignments |
+| access_permission_grants | Explicit, revocable action grants for human administrator assignments |
 | audit_events | Append-only record of important actions |
 
 ## 3. Relationship overview
@@ -100,3 +101,5 @@ Semantic similarity alone must not be treated as evidence of truth. Use lexical 
 The first SQL migration establishes the core relational entities and the eleven domain seed records. Vector columns and indexes should be introduced only after confirming the chosen embedding dimensions and managed PostgreSQL extension support. This avoids locking the schema to an embedding model prematurely.
 
 Migrations 002–005 extend the initial schema with source-library associations, categories and source verification, human/AI principals, scoped role assignments and the Executive Administrator role. These tables do not enforce API permissions by themselves; endpoint-level authorisation remains unfinished. See [migration instructions](../../backend/README.md#database-migrations) and [implementation status](implementation-status.md).
+
+Migration 006, brought forward from the knowledge-infrastructure feature branch, stores delegated administrator action grants with optional library scopes, grant reasons and revocation timestamps. The Python policy evaluates the permitted action set; identity loading and endpoint enforcement remain separate implementation work.

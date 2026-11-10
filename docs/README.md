@@ -2,7 +2,11 @@
 
 | Document | Purpose |
 |---|---|
+| [Platform build brief](COREPATH-PLATFORM.md) | Founder-supplied philosophy, architecture, governance and priorities |
+| [Founder workspace](FOUNDER-WORKSPACE.md) | Private sign-in URL, scope and backend connection boundary |
+| [Build handover](HANDOVER.md) | Product direction, verified baseline, current milestone and next steps |
 | [Implementation status](knowledge-infrastructure/implementation-status.md) | Completed work, verification evidence and next steps |
+| [Deployment procedure](knowledge-infrastructure/deployment.md) | Tracked migrations, release checks and recovery |
 | [Architecture](knowledge-infrastructure/architecture.md) | Components, technology baseline and access boundaries |
 | [Data model](knowledge-infrastructure/data-model.md) | Schema entities, relationships and evidence classifications |
 | [Decision log](knowledge-infrastructure/decisions.md) | Technical and access-governance decisions |
