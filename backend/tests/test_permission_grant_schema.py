@@ -66,8 +66,7 @@ def test_permission_grants_are_limited_to_human_administrator_roles() -> None:
                 (researcher_id, library_id),
             ).fetchone()[0]
 
-            with pytest.raises(psycopg.errors.RaiseException):
-                with connection.transaction():
+            with pytest.raises(psycopg.errors.RaiseException), connection.transaction():
                     cursor.execute(
                         """
                         INSERT INTO access_permission_grants
@@ -77,8 +76,7 @@ def test_permission_grants_are_limited_to_human_administrator_roles() -> None:
                         (researcher_assignment, administrator_id),
                     )
 
-            with pytest.raises(psycopg.errors.CheckViolation):
-                with connection.transaction():
+            with pytest.raises(psycopg.errors.CheckViolation), connection.transaction():
                     cursor.execute(
                         """
                         INSERT INTO access_permission_grants
