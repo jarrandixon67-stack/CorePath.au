@@ -37,6 +37,22 @@ Use the [CI workflow](../../.github/workflows/knowledge-infrastructure-ci.yml) a
 - [x] Read-only pending-migration check and repeat-application CI checks.
 - [x] Migration regression tests and documented deployment/recovery procedure.
 
+## Eleven-specialist runtime continuation
+
+- [x] All eleven established specialist briefs and distinct instruction/policy hashes.
+- [x] Separate specialist service with signed Coordinator dispatch and own-domain independent research.
+- [x] Active service identity, database role/domain, library status and retrieval/research grants checked per request.
+- [x] Verified active source, completed extraction and explicit model-use approval required for retrieval.
+- [x] Quoted citations, server-owned provenance, draft findings, limitations and knowledge gaps.
+- [x] Persisted run states, policy/input hashes, audit events, replay protection and transactional quotas.
+- [x] Access/evidence rechecked before saving; collaboration requests recorded without peer execution.
+- [x] Migration 007 and restricted runtime database-role template.
+- [ ] Real model quality evaluation and trusted machine-identity gateway/Coordinator integration.
+- [ ] Deployed specialist service and licensed ingestion/review workflow.
+- [ ] Scheduling, multilingual/semantic retrieval, evidence acceptance/versioning and approved collaboration execution.
+
+See the [specialist setup and boundaries](../../specialists/README.md). The human knowledge API authorisation checklist below is separate and remains incomplete. Consult the exact continuation commit's CI before claiming validation.
+
 ## Verification evidence
 
 The [cleanup merge run](https://github.com/jarrandixon67-stack/CorePath.au/actions/runs/42862635494) for commit `59ffc7006079e364b055300f1bcf19587ab2084a` passed. Its [PR run](https://github.com/jarrandixon67-stack/CorePath.au/actions/runs/42862486204) verified all eight original backend tests, all five original migrations, specialist seed data, lint and formatting.
