@@ -43,7 +43,7 @@ CREATE TABLE access_role_assignments (
 CREATE FUNCTION enforce_access_role_principal_type()
 RETURNS trigger
 LANGUAGE plpgsql
-AS $
+AS '
 DECLARE
     assigned_type TEXT;
 BEGIN
@@ -52,22 +52,22 @@ BEGIN
     WHERE id = NEW.principal_id;
 
     IF assigned_type IS NULL THEN
-        RAISE EXCEPTION 'Access principal does not exist';
+        RAISE EXCEPTION ''Access principal does not exist'';
     END IF;
 
-    IF NEW.role IN ('founder', 'administrator', 'specialist_researcher')
-       AND assigned_type <> 'human' THEN
-        RAISE EXCEPTION 'Role % requires a human principal', NEW.role;
+    IF NEW.role IN (''founder'', ''administrator'', ''specialist_researcher'')
+       AND assigned_type <> ''human'' THEN
+        RAISE EXCEPTION ''Role % requires a human principal'', NEW.role;
     END IF;
 
-    IF NEW.role IN ('specialist_ai', 'coordinator_ai')
-       AND assigned_type <> 'ai_service' THEN
-        RAISE EXCEPTION 'Role % requires an AI service principal', NEW.role;
+    IF NEW.role IN (''specialist_ai'', ''coordinator_ai'')
+       AND assigned_type <> ''ai_service'' THEN
+        RAISE EXCEPTION ''Role % requires an AI service principal'', NEW.role;
     END IF;
 
     RETURN NEW;
 END;
-$;
+';
 
 CREATE TRIGGER access_role_principal_type_guard
     BEFORE INSERT OR UPDATE OF principal_id, role
