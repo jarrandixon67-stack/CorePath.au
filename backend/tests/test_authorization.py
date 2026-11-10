@@ -85,7 +85,7 @@ def test_administrator_requires_explicit_action_and_scope_grants() -> None:
         permissions=frozenset(
             {
                 PermissionGrant(Permission.SOURCE_READ, library_id=LIBRARY_A),
-                PermissionGrant(Permission.SOURCE_VERIFY),
+                PermissionGrant(Permission.FINDING_PUBLISH),
             }
         ),
     )
