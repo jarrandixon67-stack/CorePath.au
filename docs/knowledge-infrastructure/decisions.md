@@ -95,3 +95,13 @@
 **Executive Administrator limits:** This role is broad but delegated. It may manage ordinary administrators, researcher accounts, library operations and research workflows. It cannot appoint or remove the Founder or Executive Administrator, alter Founder-reserved powers, transfer ownership, bypass the Coordinator's specialist orchestration boundary, or gain Life Profile access merely by rank.
 
 **Permission implementation:** Represent permissions as explicit actions (for example library.source.create, library.source.verify, research.finding.publish, access.user.manage, access.role.grant, platform.settings.manage). Each request must be checked against the authenticated principal, active role grant, scope, resource and action. Record privileged grants and decisions in an append-only audit trail. Deny by default.
+
+
+## D-012: Explicit, tracked transactional schema releases
+
+**Status:** Implemented technical baseline
+**Decision:** Keep the original numbered SQL files, validate and record their checksums in `schema_migrations`, and run pending files explicitly through `python -m app.migrations`. Apply the pending batch and its history atomically, with an advisory lock coordinating runners. Provide a read-only pending check. Do not run migrations during API startup or automatically adopt existing untracked schemas.
+
+**Reason:** Make repeat releases auditable, prevent reapplying or silently changing completed migrations, and ensure failures do not leave partially applied batches. Existing databases created through direct SQL need separately reviewed adoption; no reset or automatic downgrade is provided. New SQL files must remain transactional, with one outer BEGIN/COMMIT wrapper and no internal transaction-control statements.
+
+**Verification:** CI uses the runner twice, checks for pending work, validates specialist seeds and runs regression tests in isolated test schemas. See the [deployment procedure](deployment.md) and exact commit's CI result.

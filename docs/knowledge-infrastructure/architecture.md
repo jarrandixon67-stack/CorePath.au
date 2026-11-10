@@ -88,6 +88,23 @@ The Founder retains reserved ownership powers, including appointing or removing 
 
 The current shared bearer token is a temporary development mechanism only. The browser must never receive that token. The first usable workspace should be administrator-only behind a secure server-side session. Researcher invitations and library-scoped accounts can be introduced later without changing the underlying role model.
 
+### 4.9 Action permission evaluation
+
+The backend policy evaluator is deny-by-default. It evaluates an authenticated principal's active status, principal type, active role assignments, action permission and requested library scope.
+
+- Founder: broad platform and knowledge administration, including ownership-reserved actions; no implicit Life Profile access and no direct specialist-communication bypass.
+- Executive Administrator: broad delegated operations, researcher and ordinary administrator management, source verification and finding publication; cannot grant Founder or Executive Administrator roles, transfer ownership or bypass the Coordinator.
+- Administrator: no implicit operational privileges beyond those explicitly granted. Each grant names an action and may be global or restricted to one library.
+- Specialist researcher: read and contribute within the assigned library; may submit findings but cannot verify sources or publish accepted findings by default.
+- Specialist AI: retrieve and submit proposed findings only within its assigned specialist library.
+- Coordinator AI: dispatch and coordinate specialist tasks across domains; does not receive general source-management rights through the Coordinator role.
+
+The `access_permission_grants` table stores revocable action grants for human administrator role assignments. Reserved permissions are excluded from this grant table. All permission decisions must be made by backend code after authentication; client-side visibility is not an access-control mechanism.
+
+The policy evaluator is implemented and unit-tested, and the database migration for delegated administrator grants is included in CI. It is not yet connected to HTTP endpoints because the current shared bearer token does not identify an individual principal. Endpoint enforcement must follow the trusted identity/session implementation; until then, the existing internal-token routes remain a development-only boundary and must not be exposed as production user authentication.
+
+Coordinator execution is distinct from human governance. Founder and Executive Administrator authority does not itself grant `research.coordinate` or `specialist.task.dispatch`; those actions belong to the Coordinator AI. Invalid library-scoped assignments of global roles are denied, consistent with the database role constraints.
+
 ## 5. Specialist domains
 
 The initial registry contains these eleven domains:

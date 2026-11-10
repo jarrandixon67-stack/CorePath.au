@@ -6,7 +6,7 @@ FastAPI foundation for shared specialist knowledge infrastructure. Source regist
 
 - Python 3.11 or newer.
 - PostgreSQL for database-backed routes and integration tests. CI uses PostgreSQL 16.
-- The PostgreSQL `psql` client to apply migrations.
+- The PostgreSQL `psql` client is optional for database inspection.
 - Docker is optional.
 
 ## Local setup
@@ -47,17 +47,29 @@ Never commit `.env` or real credentials. Production secrets must be supplied thr
 
 ## Database migrations
 
-Apply migrations once, in filename order, to a new disposable database. Export `DATABASE_URL` into the shell first; `psql` does not load the API's `.env` file automatically.
+Export `DATABASE_URL` into the shell first; the migration command does not load the API's `.env` file automatically. From this `backend/` directory, apply to a fresh disposable database:
 
 ```bash
-psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f ../database/migrations/001_initial_knowledge_schema.sql
-psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f ../database/migrations/002_source_library_registry.sql
-psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f ../database/migrations/003_library_categories_and_verification.sql
-psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f ../database/migrations/004_identity_and_library_access.sql
-psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f ../database/migrations/005_executive_administrator_role.sql
+python -m app.migrations
+python -m app.migrations --check
 ```
 
-Migrations are not automatically run at application startup. Migration tracking and a production deployment procedure remain pending. Do not blindly rerun these scripts against an existing database or apply them to production before testing the selected PostgreSQL version and hosting service.
+Repeat application skips recorded files. The runner records filenames, versions and SHA-256 checksums in `schema_migrations`, validates existing history before applying anything, and applies the pending batch plus its history in one transaction. A failure rolls back the batch. Migration runners coordinate with a PostgreSQL advisory lock.
+
+`--check` is read-only: exit code 0 means up to date, 1 means valid pending migrations and 2 means an error. Applying migrations returns 0 on success and 2 on error. Use `--directory /path/to/release/migrations` when SQL files are stored outside the default checkout layout.
+
+The six existing migration files remain unchanged:
+
+| Version | Purpose |
+|---|---|
+| 001 | Initial knowledge schema and specialist seeds |
+| 002 | Source-library associations |
+| 003 | Categories and source verification |
+| 004 | Human/AI principals and role assignments |
+| 005 | Executive Administrator role |
+| 006 | Delegated administrator action grants |
+
+Migrations are explicitly run, not executed during API startup. If an existing database was set up by running SQL directly, the runner refuses to automatically baseline it. Do not drop data or fabricate history to get past that check; use a reviewed adoption plan. Applied files must never be edited. See the [deployment procedure](../docs/knowledge-infrastructure/deployment.md) for release, backup, recovery and existing-database handling.
 
 ## API routes
 
@@ -86,7 +98,7 @@ ruff check .
 ruff format --check .
 ```
 
-Database-dependent tests skip when `DATABASE_URL` is absent from the process environment. For the full suite, export a connection string to a fresh disposable test database, apply all five migrations and run the same commands. The source-registry test writes records and assumes empty source tables; use a fresh database for each full run. Never point tests at production.
+Database-dependent tests skip when `DATABASE_URL` is absent from the process environment. For the full suite, export a connection string to a fresh disposable test database, run the migration command above and run the same checks. Migration tests use individually generated schemas in that disposable database. The source-registry test writes records and assumes empty source tables; use a fresh database for each full run. Never point tests at production.
 
 The [GitHub Actions workflow](../.github/workflows/knowledge-infrastructure-ci.yml) provisions PostgreSQL, applies migrations, validates seed data and runs the full suite and code checks.
 

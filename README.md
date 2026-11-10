@@ -9,7 +9,7 @@ The full product vision and requirements live in the separate [CorePath reposito
 | Location | Contents |
 |---|---|
 | [backend/](backend/README.md) | API setup, configuration, endpoints and tests |
-| [database/migrations/](database/migrations/) | Five ordered PostgreSQL migrations |
+| [database/migrations/](database/migrations/) | Six ordered PostgreSQL migrations |
 | [frontend/](frontend/README.md) | Static, interactive design prototype |
 | [docs/](docs/README.md) | Architecture, data model, decisions and implementation status |
 | [CI workflow](.github/workflows/knowledge-infrastructure-ci.yml) | Migration, seed, test, lint and format checks |
@@ -19,14 +19,20 @@ The full product vision and requirements live in the separate [CorePath reposito
 - Database schema and seed records for eleven specialist libraries.
 - Internal API routes for libraries, categories, source metadata and source verification.
 - Source records shared between libraries without duplicating their metadata.
-- Database identity and role records, with endpoint-level role enforcement still pending.
+- Database identity, role and administrator action-grant records.
+- A tested deny-by-default permissions engine; identity loading and endpoint-level enforcement remain pending.
 - Liveness and database-readiness endpoints.
+- Explicit database migration runner with history, checksum validation and transactional application.
 
 The frontend uses illustrative data and does not save form submissions or call the API. Source ingestion, retrieval, research automation, production authentication and deployment remain unfinished. See [implementation status](docs/knowledge-infrastructure/implementation-status.md) for evidence and the next implementation sequence.
 
+For ongoing development, start with the [build handover](docs/HANDOVER.md) and [deployment procedure](docs/knowledge-infrastructure/deployment.md).
+
+The initial [private Founder workspace](https://corepath-founder.inquisitiveblade1.chatgpt.site) uses ChatGPT sign-in. It is a separate owner-private portal; it does not yet connect to this knowledge API or provision PostgreSQL roles. See its [access and maintenance notes](docs/FOUNDER-WORKSPACE.md).
+
 ## Local development
 
-Use Python 3.11 or newer. Follow the [backend setup](backend/README.md#local-setup) to create a virtual environment and install the API. PostgreSQL is optional for liveness checks and database-independent tests; the source-registry integration test requires a disposable database with all five migrations applied.
+Use Python 3.11 or newer. Follow the [backend setup](backend/README.md#local-setup) to create a virtual environment and install the API. PostgreSQL is optional for liveness checks and database-independent tests; the source-registry integration test requires a disposable database with all six migrations applied.
 
 Open [frontend/index.html](frontend/index.html) in a browser to explore the independent design prototype. No frontend build tools are required.
 
