@@ -10,6 +10,7 @@ from app.database import create_pool
 from app.schemas import CategoryCreate, SourceCreate, VerificationUpdate
 from app.security import require_internal_token
 from app.source_service import (
+    CategoryNotFoundError,
     LibraryNotFoundError,
     SourceNotFoundError,
     create_library_category,
