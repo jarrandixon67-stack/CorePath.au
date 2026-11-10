@@ -94,7 +94,7 @@ def get_libraries(pool=Depends(get_database_pool),  # noqa: B008
 )
 def get_library_sources(
     library_id: UUID,
-    pool=Depends(get_database_pool),
+    pool=Depends(get_database_pool),  # noqa: B008
 ) -> list[dict]:
     """List registered sources associated with a specialist library."""
     try:
@@ -114,7 +114,7 @@ def get_library_sources(
 def create_library_source(
     library_id: UUID,
     source: SourceCreate,
-    pool=Depends(get_database_pool),
+    pool=Depends(get_database_pool),  # noqa: B008
 ) -> dict:
     """Register source metadata in a specialist library; does not download the source."""
     try:
@@ -135,7 +135,7 @@ def create_library_source(
 def add_existing_source_to_library(
     library_id: UUID,
     source_id: UUID,
-    pool=Depends(get_database_pool),
+    pool=Depends(get_database_pool),  # noqa: B008
 ) -> None:
     """Associate an existing shared source record with another specialist library."""
     try:
