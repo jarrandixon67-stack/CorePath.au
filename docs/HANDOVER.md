@@ -17,6 +17,10 @@ The immediate build is the shared knowledge foundation for eleven specialist dom
 
 ## Current continuation
 
+The founder has prioritised the **Life Profiling bot first**, supplying `Life Profile.docx` as requirements input. The first [profile service](../life-profile/README.md) and [source-document requirements review](life-profile/requirements.md) now define that continuation. It is a separate service/database, with signed Personal AI capabilities, encrypted profile data, consented model analysis, owner review/correction and controlled sharing. This changes the immediate bot build order; it does not discard the remaining eleven-specialist architecture.
+
+The model, trusted identity gateway and profile deployment are not configured by this code. The hosted Founder portal remains a separate private workspace, without a live profile conversation interface. Confirm the Life Profile continuation commit's actual CI results before claiming its tests pass.
+
 The [private Founder workspace](FOUNDER-WORKSPACE.md) is now deployed with managed ChatGPT sign-in. Its 14 local request/response tests passed. It does not yet connect to PostgreSQL or provision its Founder role; keep that distinction visible when describing access.
 
 The previous handover identifies additional permissions work on `feature/knowledge-infrastructure-foundation` at `584b824aa954e10d5ea19cbe2c91436c960ca346`. Its [CI run](https://github.com/jarrandixon67-stack/CorePath.au/actions/runs/42839462104) passed. This continuation brings its policy engine, tests and migration 006 forward while retaining the main-branch cleanup. Coordinator-only execution is protected against human-role escalation.
@@ -31,6 +35,8 @@ A supporting foundation task is also implemented here: tracked database migratio
 Use the exact continuation commit's CI result to confirm these additions. The verified baseline above is not evidence that a later commit or a production deployment passed.
 
 ## Next implementation sequence
+
+**Current first-bot priority:** complete the Life Profile model connection and evaluations, separate deployment, trusted Personal AI gateway, and owner-facing consent/review controls. The broader sequence below remains relevant to the shared knowledge platform.
 
 1. Confirm the integrated test suite and permissions engine are stable.
 2. Select the production identity provider and implement secure administrator authentication and server-side sessions.
