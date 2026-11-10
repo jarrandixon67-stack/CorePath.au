@@ -12,7 +12,6 @@ from app.authorization import (
     is_authorized,
 )
 
-
 LIBRARY_A = uuid4()
 LIBRARY_B = uuid4()
 
