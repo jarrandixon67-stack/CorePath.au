@@ -40,12 +40,16 @@ def test_readiness_reports_connected_database() -> None:
     assert response.json() == {"status": "ready", "database": "connected"}
 
 
-def test_internal_route_rejects_missing_token() -> None:
-    with TestClient(app) as client:
-        response = client.get("/v1/libraries")
-
-    assert response.status_code == 401
-    assert response.json()["detail"] == "Invalid or missing bearer token"
+def test_internal_route_rejects_missing_token(monkeypatch) -> None:
+    monkeypatch.setenv("INTERNAL_API_TOKEN", "configured-test-token")
+    get_settings.cache_clear()
+    try:
+        with TestClient(app) as client:
+            response = client.get("/v1/libraries")
+        assert response.status_code == 401
+        assert response.json()["detail"] == "Invalid or missing bearer token"
+    finally:
+        get_settings.cache_clear()
 
 
 def test_internal_route_requires_configured_token(monkeypatch) -> None:
