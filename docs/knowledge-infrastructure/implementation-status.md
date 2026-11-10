@@ -73,6 +73,13 @@ The migration-tracking milestone and [deployment procedure](deployment.md) are i
 
 ## Important boundary
 
+### Life Profile continuation
+
+The founder has prioritised the Life Profiling bot as the first bot to build. Its [separate service](../../life-profile/README.md) now implements encrypted storage, consent, signed Personal AI capabilities, proposed observations, owner review/correction/deletion and explicitly approved context sharing. Its tables and migration are in a separate database, not the knowledge schema.
+
+The model connection, real owner-identity gateway, deployed profile database and user-facing review flow remain unconfigured. Consult the exact Life Profile continuation commit's CI results; this implementation must not be represented as an operational bot in the Founder portal.
+
+
 Repository commits are not equivalent to deployed infrastructure. No production API, database, research automation or AI specialist is considered operational until separately provisioned, deployed and tested.
 
 

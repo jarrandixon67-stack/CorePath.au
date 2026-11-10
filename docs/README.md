@@ -2,6 +2,8 @@
 
 | Document | Purpose |
 |---|---|
+| [Life Profile bot requirements](life-profile/requirements.md) | Source-document decisions, first implementation and remaining boundaries |
+| [Life Profile service setup](../life-profile/README.md) | Separate database, encrypted storage, API and model configuration |
 | [Platform build brief](COREPATH-PLATFORM.md) | Founder-supplied philosophy, architecture, governance and priorities |
 | [Founder workspace](FOUNDER-WORKSPACE.md) | Private sign-in URL, scope and backend connection boundary |
 | [Build handover](HANDOVER.md) | Product direction, verified baseline, current milestone and next steps |

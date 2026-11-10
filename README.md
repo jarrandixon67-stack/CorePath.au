@@ -30,6 +30,12 @@ For ongoing development, start with the [build handover](docs/HANDOVER.md) and [
 
 The initial [private Founder workspace](https://corepath-founder.inquisitiveblade1.chatgpt.site) uses ChatGPT sign-in. It is a separate owner-private portal; it does not yet connect to this knowledge API or provision PostgreSQL roles. See its [access and maintenance notes](docs/FOUNDER-WORKSPACE.md).
 
+## Life Profiling bot
+
+The first [Life Profile service](life-profile/README.md) is implemented separately from the knowledge API, based on the founder's Life Profile working draft. It supports consented conversation analysis, encrypted proposed observations, owner review/correction/deletion and explicitly approved Personal AI context. Its [requirements](docs/life-profile/requirements.md) preserve the draft categories and distinguish observations from confirmed understanding.
+
+This code does not make the bot operational in the Founder portal. A separate database, encryption key, trusted Personal AI identity gateway and configured model are required; no live personal data or model requests were used to test it.
+
 ## Local development
 
 Use Python 3.11 or newer. Follow the [backend setup](backend/README.md#local-setup) to create a virtual environment and install the API. PostgreSQL is optional for liveness checks and database-independent tests; the source-registry integration test requires a disposable database with all six migrations applied.
