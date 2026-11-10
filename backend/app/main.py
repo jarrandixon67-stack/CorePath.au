@@ -125,9 +125,10 @@ def create_library_source(
         return register_library_source(pool, library_id, source)
     except LibraryNotFoundError as exc:
         raise HTTPException(status_code=404, detail="Knowledge library not found") from exc
+    except CategoryNotFoundError as exc:
+        raise HTTPException(status_code=422, detail="Category does not belong to this library") from exc
     except (OperationalError, PoolTimeout, TimeoutError) as exc:
         raise HTTPException(status_code=503, detail="Database is unavailable") from exc
-
 
 
 @app.put(
