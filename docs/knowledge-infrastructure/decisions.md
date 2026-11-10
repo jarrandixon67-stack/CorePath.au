@@ -47,3 +47,15 @@
 **Status:** Accepted  
 **Decision:** Defer vector schema/index details until embedding model and dimensions are selected.  
 **Reason:** Avoid unnecessary migrations and model-specific coupling.
+
+## D-009: Phased human and AI access with library-scoped researcher roles
+
+**Status:** Accepted  
+**Decision:** Design access for founder, administrators, specialist researchers, specialist AI services and the Coordinator from the beginning. Introduce human researcher access after the initial administrator workspace is operational. Specialist researcher and specialist AI grants are scoped to an individual library.  
+**Reason:** Avoid redesigning access controls later while preserving least privilege and the separation between human contributors and AI service identities.
+
+**Permission boundary:** Authentication establishes who is calling; authorisation determines which libraries and actions that identity may use. Reading a source, contributing a research assessment, registering a source, verifying a source, managing permissions and publishing an accepted finding are distinct permissions. A researcher does not automatically receive verification, administrative or cross-library rights.
+
+**AI boundary:** Specialist AI identities are library-scoped. The Coordinator is a separate service identity authorised to coordinate cross-specialist work. Specialist-to-specialist collaboration remains Coordinator-authorised. No knowledge-library role grants access to Life Profile data.
+
+**Implementation constraint:** The current shared bearer token is a temporary internal development guard, not production human authentication. Production access must use a trusted identity provider, server-side sessions or service credentials, and server-enforced permissions. Do not place internal credentials in browser JavaScript.
