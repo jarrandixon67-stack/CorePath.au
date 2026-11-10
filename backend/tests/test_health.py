@@ -20,7 +20,7 @@ def test_liveness_is_available_without_database(monkeypatch) -> None:
 
 
 def test_readiness_reports_missing_database(monkeypatch) -> None:
-    monkeypatch.delenv("DATABASE_URL", raising=False)
+    monkeypatch.setenv("DATABASE_URL", "")
     get_settings.cache_clear()
     try:
         with TestClient(app) as client:
