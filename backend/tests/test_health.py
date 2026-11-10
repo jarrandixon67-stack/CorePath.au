@@ -31,7 +31,9 @@ def test_readiness_reports_missing_database(monkeypatch) -> None:
         get_settings.cache_clear()
 
 
-@pytest.mark.skipif(not os.getenv("DATABASE_URL"), reason="requires a configured PostgreSQL service")
+@pytest.mark.skipif(
+    not os.getenv("DATABASE_URL"), reason="requires a configured PostgreSQL service"
+)
 def test_readiness_reports_connected_database() -> None:
     with TestClient(app) as client:
         response = client.get("/health/ready")

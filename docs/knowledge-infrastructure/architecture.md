@@ -25,7 +25,7 @@ This document describes the proposed architecture. It does not claim that produc
 
 ## 3. Proposed technology baseline
 
-The repository currently contains only a minimal README. No application framework, database, deployment configuration or existing backend has been identified. The following is therefore a proposed baseline to validate before deployment:
+The repository contains a FastAPI backend, PostgreSQL migrations, a static interface prototype and a GitHub Actions workflow. The table below records the initial technology baseline, including infrastructure and capabilities that remain proposed. See [implementation status](implementation-status.md) for the current boundary between implemented, verified and planned work.
 
 | Concern | Initial recommendation | Rationale |
 |---|---|---|

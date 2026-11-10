@@ -82,7 +82,8 @@ def readiness(request: Request) -> dict[str, str]:
     tags=["knowledge sources"],
     dependencies=[Depends(require_internal_token)],
 )
-def get_libraries(pool=Depends(get_database_pool),  # noqa: B008
+def get_libraries(
+    pool=Depends(get_database_pool),  # noqa: B008
 ) -> list[dict]:
     """List specialist libraries available to the authenticated internal caller."""
     try:
@@ -126,7 +127,9 @@ def create_library_source(
     except LibraryNotFoundError as exc:
         raise HTTPException(status_code=404, detail="Knowledge library not found") from exc
     except CategoryNotFoundError as exc:
-        raise HTTPException(status_code=422, detail="Category does not belong to this library") from exc
+        raise HTTPException(
+            status_code=422, detail="Category does not belong to this library"
+        ) from exc
     except (OperationalError, PoolTimeout, TimeoutError) as exc:
         raise HTTPException(status_code=503, detail="Database is unavailable") from exc
 
@@ -151,7 +154,6 @@ def add_existing_source_to_library(
         raise HTTPException(status_code=404, detail="Knowledge source not found") from exc
     except (OperationalError, PoolTimeout, TimeoutError) as exc:
         raise HTTPException(status_code=503, detail="Database is unavailable") from exc
-
 
 
 @app.get(
