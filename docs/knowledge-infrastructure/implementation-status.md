@@ -1,7 +1,8 @@
 # Knowledge Infrastructure Implementation Status
 
-**Branch:** `feature/knowledge-infrastructure-foundation`  
-**Status date:** 2026-11-10
+**Scope:** Knowledge-infrastructure foundation in this repository.
+
+Use the [CI workflow](../../.github/workflows/knowledge-infrastructure-ci.yml) and [GitHub Actions results](https://github.com/jarrandixon67-stack/CorePath.au/actions) to verify the exact branch and commit being assessed.
 
 ## Completed repository work
 
@@ -33,11 +34,15 @@
 - [x] Executive Administrator role constrained to a global human principal.
 - [x] CI applies and validates the Executive Administrator migration.
 
-## Not yet verified
+## Verification evidence
 
-- [ ] GitHub Actions workflow has completed successfully.
-- [ ] Python dependency installation and automated tests executed in CI.
-- [ ] SQL migration applied successfully to the CI PostgreSQL service.
+The [main-branch baseline run](https://github.com/jarrandixon67-stack/CorePath.au/actions/runs/42833588499) for commit `357f936ad34e3382df9f835aeabce74de90ff061` installed dependencies, applied all five migrations, validated seed records and passed all eight backend tests. The overall run failed its lint step on an import-formatting issue in `app/schemas.py`. These results establish test-database behaviour, not production readiness.
+
+- [x] Python dependencies installed and automated tests executed in the baseline CI run.
+- [x] All five migrations applied successfully to the CI PostgreSQL 16 service.
+- [ ] Confirm a successful complete CI run for the release commit, including lint and formatting.
+
+## Not yet verified or implemented
 - [ ] Migration tested against the selected managed PostgreSQL service/version.
 - [ ] Cloud provider, region and operating budget selected.
 - [ ] Database backups and restore procedure tested.

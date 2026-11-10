@@ -1,0 +1,21 @@
+# Local credentials and development environments
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+
+# Python tools and build outputs
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+.coverage
+htmlcov/
+
+# Operating-system files
+.DS_Store
+Thumbs.db

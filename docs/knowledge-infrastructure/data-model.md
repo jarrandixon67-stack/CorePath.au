@@ -19,6 +19,8 @@
 | specialist_domains | Canonical list of eleven specialist domains |
 | knowledge_libraries | Domain-specific collections |
 | knowledge_sources | Bibliographic or web source identity |
+| source_library_links | Shared source associations with specialist libraries |
+| knowledge_categories | Categories within an individual library |
 | knowledge_documents | Specific file, edition or captured web document |
 | document_sections | Addressable text sections used for retrieval |
 | research_projects | Scoped investigations |
@@ -26,14 +28,16 @@
 | evidence_assessments | Assessment of a finding and its evidence |
 | source_relationships | Support, challenge, context, duplication or supersession links |
 | knowledge_versions | Versioned snapshots of curated knowledge items |
-| access_permissions | Domain and action permissions for service identities |
+| access_permissions | Domain and action permission records for service identities |
+| access_principals | Registry of human and AI service identities |
+| access_role_assignments | Global or library-scoped role assignments |
 | audit_events | Append-only record of important actions |
 
 ## 3. Relationship overview
 
 - One specialist domain has one primary library; a library belongs to one domain.
 - A source may have multiple documents or editions.
-- A document belongs to one source and one library; shared source records can be linked across libraries using explicit association records in a later extension.
+- A document belongs to one source and one library. Migration 002 adds source_library_links so a source record can be associated with multiple libraries; migration 003 adds library categories.
 - A document contains many sections.
 - A research project belongs to a domain and may reference many sources.
 - A research finding belongs to a project and may cite many sections and sources.
@@ -94,3 +98,5 @@ Semantic similarity alone must not be treated as evidence of truth. Use lexical 
 ## 8. Implementation note
 
 The first SQL migration establishes the core relational entities and the eleven domain seed records. Vector columns and indexes should be introduced only after confirming the chosen embedding dimensions and managed PostgreSQL extension support. This avoids locking the schema to an embedding model prematurely.
+
+Migrations 002–005 extend the initial schema with source-library associations, categories and source verification, human/AI principals, scoped role assignments and the Executive Administrator role. These tables do not enforce API permissions by themselves; endpoint-level authorisation remains unfinished. See [migration instructions](../../backend/README.md#database-migrations) and [implementation status](implementation-status.md).

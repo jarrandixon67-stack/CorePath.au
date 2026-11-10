@@ -1,9 +1,15 @@
+import os
+
+import pytest
 from fastapi.testclient import TestClient
 
 from app.config import get_settings
 from app.main import app
 
 
+@pytest.mark.skipif(
+    not os.getenv("DATABASE_URL"), reason="requires a configured PostgreSQL service"
+)
 def test_source_registry_category_and_verification_flow(monkeypatch) -> None:
     monkeypatch.setenv("INTERNAL_API_TOKEN", "source-test-token")
     get_settings.cache_clear()

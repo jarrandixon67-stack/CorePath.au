@@ -69,3 +69,7 @@ jobs:
       - name: Run lint checks
         working-directory: backend
         run: ruff check .
+
+      - name: Check Python formatting
+        working-directory: backend
+        run: ruff format --check .
