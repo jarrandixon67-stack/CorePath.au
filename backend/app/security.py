@@ -9,8 +9,8 @@ _bearer = HTTPBearer(auto_error=False)
 
 
 def require_internal_token(
-    credentials: HTTPAuthorizationCredentials | None = Depends(_bearer),
-    settings: Settings = Depends(get_settings),
+    credentials: HTTPAuthorizationCredentials | None = Depends(_bearer),  # noqa: B008
+    settings: Settings = Depends(get_settings),  # noqa: B008
 ) -> str:
     """Protect internal knowledge-management routes.
 

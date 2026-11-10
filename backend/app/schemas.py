@@ -1,3 +1,4 @@
+# ruff: noqa: I001
 from datetime import date
 from typing import Any, Literal
 from uuid import UUID

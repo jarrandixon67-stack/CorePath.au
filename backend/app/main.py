@@ -11,11 +11,11 @@ from app.schemas import SourceCreate
 from app.security import require_internal_token
 from app.source_service import (
     LibraryNotFoundError,
+    SourceNotFoundError,
+    link_existing_source,
     list_libraries,
     list_library_sources,
     register_library_source,
-    link_existing_source,
-    SourceNotFoundError,
 )
 
 
@@ -78,7 +78,8 @@ def readiness(request: Request) -> dict[str, str]:
     tags=["knowledge sources"],
     dependencies=[Depends(require_internal_token)],
 )
-def get_libraries(pool=Depends(get_database_pool)) -> list[dict]:
+def get_libraries(pool=Depends(get_database_pool),  # noqa: B008
+) -> list[dict]:
     """List specialist libraries available to the authenticated internal caller."""
     try:
         return list_libraries(pool)
@@ -93,7 +94,7 @@ def get_libraries(pool=Depends(get_database_pool)) -> list[dict]:
 )
 def get_library_sources(
     library_id: UUID,
-    pool=Depends(get_database_pool),
+    pool=Depends(get_database_pool),  # noqa: B008
 ) -> list[dict]:
     """List registered sources associated with a specialist library."""
     try:
@@ -113,7 +114,7 @@ def get_library_sources(
 def create_library_source(
     library_id: UUID,
     source: SourceCreate,
-    pool=Depends(get_database_pool),
+    pool=Depends(get_database_pool),  # noqa: B008
 ) -> dict:
     """Register source metadata in a specialist library; does not download the source."""
     try:
@@ -134,7 +135,7 @@ def create_library_source(
 def add_existing_source_to_library(
     library_id: UUID,
     source_id: UUID,
-    pool=Depends(get_database_pool),
+    pool=Depends(get_database_pool),  # noqa: B008
 ) -> None:
     """Associate an existing shared source record with another specialist library."""
     try:
