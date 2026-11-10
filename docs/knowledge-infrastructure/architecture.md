@@ -72,7 +72,8 @@ The access model is designed for staged introduction:
 | Principal / role | Scope | Intended permissions |
 |---|---|---|
 | Founder | Global | Full governance and emergency administration |
-| Executive Administrator | Global | Broad delegated operational and governance authority; manages administrators, researchers, libraries and research operations, subject to Founder-reserved powers |\n| CorePath administrator | Global or explicitly delegated | Manage libraries, sources, categories, users and access grants within delegated scope |
+| Executive Administrator | Global | Broad delegated operational and governance authority; manages administrators, researchers, libraries and research operations, subject to Founder-reserved powers |
+| CorePath administrator | Global or explicitly delegated | Manage libraries, sources, categories, users and access grants within delegated scope |
 | Specialist researcher | Assigned library only | Read authorised material, register permitted sources, contribute research notes and submit findings for review |
 | Specialist AI | Its own specialist library | Retrieve and research within its domain; submit proposed findings through authorised interfaces |
 | Coordinator AI | Cross-library coordination | Dispatch scoped research tasks, request specialist collaboration and consolidate returned findings |
@@ -83,7 +84,9 @@ The initial schema stores human and AI principals separately, scopes researcher 
 
 Actions are distinct permissions. Reading, source registration, editing metadata, verification, accepting findings, publishing knowledge and managing access must not be bundled into one broad researcher permission. Verification and publication should require delegated review authority.
 
-The Founder retains reserved ownership powers, including appointing or removing the Executive Administrator, transferring ownership and changing reserved Founder permissions. The Executive Administrator does not inherit those powers. The role is assigned to an individually authenticated human account, never a shared login.\n\nThe current shared bearer token is a temporary development mechanism only. The browser must never receive that token. The first usable workspace should be administrator-only behind a secure server-side session. Researcher invitations and library-scoped accounts can be introduced later without changing the underlying role model.
+The Founder retains reserved ownership powers, including appointing or removing the Executive Administrator, transferring ownership and changing reserved Founder permissions. The Executive Administrator does not inherit those powers. The role is assigned to an individually authenticated human account, never a shared login.
+
+The current shared bearer token is a temporary development mechanism only. The browser must never receive that token. The first usable workspace should be administrator-only behind a secure server-side session. Researcher invitations and library-scoped accounts can be introduced later without changing the underlying role model.
 
 ## 5. Specialist domains
 
