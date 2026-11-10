@@ -17,6 +17,10 @@
 - [x] Dockerfile and local development documentation.
 - [x] GitHub Actions workflow for PostgreSQL migration validation, specialist seed-count checks, backend tests and linting.\n- [x] Source-to-library association migration.\n- [x] Authenticated source registry API: list libraries, list library sources and register source metadata.\n- [x] Initial bearer-token guard and authentication tests.
 - [x] Source records can be associated with multiple specialist libraries without duplicating source metadata.\n- [x] Specialist library categories and initial category seed data.\n- [x] Live library overview endpoint with registered-source, verified-record and accepted-finding counts.\n- [x] Category creation and category-aware source registration endpoints.\n- [x] Source verification status updates with audit events.\n- [x] End-to-end CI test for library, category, source registration and verification flow.
+- [x] Transactional database connection configuration with regression tests.
+- [x] Initial human and AI principal registry with library-scoped researcher and specialist-AI role grants.
+- [x] Database guard enforcing human versus AI service role types.
+- [x] CI migration validation for identity and access schema.
 
 ## Not yet verified
 
@@ -26,17 +30,23 @@
 - [ ] Migration tested against the selected managed PostgreSQL service/version.
 - [ ] Cloud provider, region and operating budget selected.
 - [ ] Database backups and restore procedure tested.
-- [ ] Production per-service identity and scoped permission enforcement implemented.
+- [ ] Production identity provider and secure server-side session selected and implemented.
+- [ ] Endpoint-level role and action authorisation implemented and tested.
+- [ ] Founder and administrator accounts provisioned through trusted identity management.
+- [ ] Specialist researcher invitation and library-scoped access workflow implemented.
 
 ## Next implementation sequence
 
 1. Confirm CI is green and correct any issues.
 2. Add schema migration tracking and deployment procedure.
-3. Complete source registry validation, duplicate handling and production service identity controls.
-4. Implement document ingestion, extraction and section indexing.
-5. Implement hybrid retrieval and provenance-rich results.
-6. Implement evidence assessments and knowledge versioning.
-7. Add Coordinator-authorised cross-specialist research workflows.
+3. Implement secure administrator authentication and server-side session handling; choose identity provider before deployment.
+4. Implement action-level authorisation for founder and administrator roles, then library-scoped researcher access.
+5. Connect Intelligence Centre through a server-side API proxy; remove hardcoded demonstration data.
+6. Complete source registry validation and duplicate handling.
+7. Implement document ingestion, extraction and section indexing.
+8. Implement hybrid retrieval and provenance-rich results.
+9. Implement evidence assessments and knowledge versioning.
+10. Add Coordinator-authorised cross-specialist research workflows.
 
 ## Important boundary
 
