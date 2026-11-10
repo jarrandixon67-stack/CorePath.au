@@ -8,7 +8,7 @@ from app.main import app
 
 
 def test_liveness_is_available_without_database(monkeypatch) -> None:
-    monkeypatch.delenv("DATABASE_URL", raising=False)
+    monkeypatch.setenv("DATABASE_URL", "")
     get_settings.cache_clear()
     try:
         with TestClient(app) as client:
@@ -49,7 +49,7 @@ def test_internal_route_rejects_missing_token() -> None:
 
 
 def test_internal_route_requires_configured_token(monkeypatch) -> None:
-    monkeypatch.delenv("INTERNAL_API_TOKEN", raising=False)
+    monkeypatch.setenv("INTERNAL_API_TOKEN", "")
     get_settings.cache_clear()
     try:
         with TestClient(app) as client:
