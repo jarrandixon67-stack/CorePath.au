@@ -171,15 +171,19 @@ def is_authorized(
         elif grant.library_id is not None and grant.library_id != library_id:
             continue
 
-        if grant.role == Role.FOUNDER:
-            if principal.principal_type == PrincipalType.HUMAN:
-                if permission in FOUNDER_PERMISSIONS:
-                    return True
+        if (
+            grant.role == Role.FOUNDER
+            and principal.principal_type == PrincipalType.HUMAN
+            and permission in FOUNDER_PERMISSIONS
+        ):
+            return True
 
-        elif grant.role == Role.EXECUTIVE_ADMINISTRATOR:
-            if principal.principal_type == PrincipalType.HUMAN:
-                if permission in EXECUTIVE_ADMINISTRATOR_PERMISSIONS:
-                    return True
+        elif (
+            grant.role == Role.EXECUTIVE_ADMINISTRATOR
+            and principal.principal_type == PrincipalType.HUMAN
+            and permission in EXECUTIVE_ADMINISTRATOR_PERMISSIONS
+        ):
+            return True
 
         elif grant.role == Role.ADMINISTRATOR:
             if principal.principal_type != PrincipalType.HUMAN:
@@ -191,19 +195,25 @@ def is_authorized(
                     if permission in ADMINISTRATOR_GRANTABLE_PERMISSIONS:
                         return True
 
-        elif grant.role == Role.SPECIALIST_RESEARCHER:
-            if principal.principal_type == PrincipalType.HUMAN:
-                if permission in RESEARCHER_PERMISSIONS:
-                    return True
+        elif (
+            grant.role == Role.SPECIALIST_RESEARCHER
+            and principal.principal_type == PrincipalType.HUMAN
+            and permission in RESEARCHER_PERMISSIONS
+        ):
+            return True
 
-        elif grant.role == Role.SPECIALIST_AI:
-            if principal.principal_type == PrincipalType.AI_SERVICE:
-                if permission in SPECIALIST_AI_PERMISSIONS:
-                    return True
+        elif (
+            grant.role == Role.SPECIALIST_AI
+            and principal.principal_type == PrincipalType.AI_SERVICE
+            and permission in SPECIALIST_AI_PERMISSIONS
+        ):
+            return True
 
-        elif grant.role == Role.COORDINATOR_AI:
-            if principal.principal_type == PrincipalType.AI_SERVICE:
-                if permission in COORDINATOR_PERMISSIONS:
-                    return True
+        elif (
+            grant.role == Role.COORDINATOR_AI
+            and principal.principal_type == PrincipalType.AI_SERVICE
+            and permission in COORDINATOR_PERMISSIONS
+        ):
+            return True
 
     return False
