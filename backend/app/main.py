@@ -7,15 +7,19 @@ from psycopg_pool import PoolTimeout
 
 from app.config import get_settings
 from app.database import create_pool
-from app.schemas import SourceCreate
+from app.schemas import CategoryCreate, SourceCreate, VerificationUpdate
 from app.security import require_internal_token
 from app.source_service import (
+    CategoryNotFoundError,
     LibraryNotFoundError,
     SourceNotFoundError,
     link_existing_source,
+    create_library_category,
+    get_library_overview,
     list_libraries,
     list_library_sources,
     register_library_source,
+    update_source_verification,
 )
 
 
@@ -144,5 +148,64 @@ def add_existing_source_to_library(
         raise HTTPException(status_code=404, detail="Knowledge library not found") from exc
     except SourceNotFoundError as exc:
         raise HTTPException(status_code=404, detail="Knowledge source not found") from exc
+    except (OperationalError, PoolTimeout, TimeoutError) as exc:
+        raise HTTPException(status_code=503, detail="Database is unavailable") from exc
+
+
+
+@app.get(
+    "/v1/libraries/{library_id}/overview",
+    tags=["knowledge libraries"],
+    dependencies=[Depends(require_internal_token)],
+)
+def get_library_dashboard(
+    library_id: UUID,
+    pool=Depends(get_database_pool),  # noqa: B008
+) -> dict:
+    """Return live source counts, verified counts, findings and categories."""
+    try:
+        return get_library_overview(pool, library_id)
+    except LibraryNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Knowledge library not found") from exc
+    except (OperationalError, PoolTimeout, TimeoutError) as exc:
+        raise HTTPException(status_code=503, detail="Database is unavailable") from exc
+
+
+@app.post(
+    "/v1/libraries/{library_id}/categories",
+    tags=["knowledge libraries"],
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_internal_token)],
+)
+def create_category(
+    library_id: UUID,
+    category: CategoryCreate,
+    pool=Depends(get_database_pool),  # noqa: B008
+) -> dict:
+    """Create a category inside one specialist library."""
+    try:
+        return create_library_category(pool, library_id, category)
+    except LibraryNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Knowledge library not found") from exc
+    except (OperationalError, PoolTimeout, TimeoutError) as exc:
+        raise HTTPException(status_code=503, detail="Database is unavailable") from exc
+
+
+@app.patch(
+    "/v1/libraries/{library_id}/sources/{source_id}/verification",
+    tags=["knowledge libraries"],
+    dependencies=[Depends(require_internal_token)],
+)
+def set_source_verification(
+    library_id: UUID,
+    source_id: UUID,
+    update: VerificationUpdate,
+    pool=Depends(get_database_pool),  # noqa: B008
+) -> dict:
+    """Record a source verification decision with an audit event."""
+    try:
+        return update_source_verification(pool, library_id, source_id, update)
+    except SourceNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Source not found in this library") from exc
     except (OperationalError, PoolTimeout, TimeoutError) as exc:
         raise HTTPException(status_code=503, detail="Database is unavailable") from exc
