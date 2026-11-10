@@ -59,3 +59,15 @@
 **AI boundary:** Specialist AI identities are library-scoped. The Coordinator is a separate service identity authorised to coordinate cross-specialist work. Specialist-to-specialist collaboration remains Coordinator-authorised. No knowledge-library role grants access to Life Profile data.
 
 **Implementation constraint:** The current shared bearer token is a temporary internal development guard, not production human authentication. Production access must use a trusted identity provider, server-side sessions or service credentials, and server-enforced permissions. Do not place internal credentials in browser JavaScript.
+
+## D-010: Founder and Executive Administrator hierarchy
+
+**Status:** Accepted  
+**Decision:** Add a global **Executive Administrator** role directly below the Founder and above all other administrators, researchers and contributors. The Founder retains ultimate ownership and reserved authority. The Executive Administrator receives broad operational and governance permissions delegated by the Founder.  
+**Reason:** CorePath requires a trusted second-in-command who can manage the platform and people without holding the Founder's ultimate ownership powers.
+
+**Reserved Founder powers:** Transfer or relinquish ownership; appoint or remove the Executive Administrator; change the Founder role or its reserved permissions; approve dissolution or transfer of CorePath; and override or revoke any delegated grant. These powers are not inherited by the Executive Administrator.
+
+**Executive Administrator scope:** Global operational oversight, user and researcher administration, library and source management, research oversight, and delegated approval of knowledge publication and verification. The Founder may narrow or revoke these permissions. The role does not automatically grant access to Life Profile data or private user conversations; those remain separately controlled boundaries.
+
+**Security:** The role is assigned only to a named, individually authenticated human principal. It must not be shared as a generic account. All privileged actions are audited, and sensitive changes should require re-authentication and, where appropriate, a second approval.
