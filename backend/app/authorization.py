@@ -171,49 +171,33 @@ def is_authorized(
         elif grant.library_id is not None and grant.library_id != library_id:
             continue
 
+        role_permissions = {
+            (Role.FOUNDER, PrincipalType.HUMAN): FOUNDER_PERMISSIONS,
+            (Role.EXECUTIVE_ADMINISTRATOR, PrincipalType.HUMAN): (
+                EXECUTIVE_ADMINISTRATOR_PERMISSIONS
+            ),
+            (Role.SPECIALIST_RESEARCHER, PrincipalType.HUMAN): RESEARCHER_PERMISSIONS,
+            (Role.SPECIALIST_AI, PrincipalType.AI_SERVICE): SPECIALIST_AI_PERMISSIONS,
+            (Role.COORDINATOR_AI, PrincipalType.AI_SERVICE): COORDINATOR_PERMISSIONS,
+        }.get((grant.role, principal.principal_type), frozenset())
+
+        if permission in role_permissions:
+            return True
+
         if (
-            grant.role == Role.FOUNDER
+            grant.role == Role.ADMINISTRATOR
             and principal.principal_type == PrincipalType.HUMAN
-            and permission in FOUNDER_PERMISSIONS
         ):
-            return True
-
-        elif (
-            grant.role == Role.EXECUTIVE_ADMINISTRATOR
-            and principal.principal_type == PrincipalType.HUMAN
-            and permission in EXECUTIVE_ADMINISTRATOR_PERMISSIONS
-        ):
-            return True
-
-        elif grant.role == Role.ADMINISTRATOR:
-            if principal.principal_type != PrincipalType.HUMAN:
-                continue
             for permission_grant in grant.permissions:
-                if not permission_grant.active or permission_grant.permission != permission:
-                    continue
-                if permission_grant.library_id is None or permission_grant.library_id == library_id:
-                    if permission in ADMINISTRATOR_GRANTABLE_PERMISSIONS:
-                        return True
-
-        elif (
-            grant.role == Role.SPECIALIST_RESEARCHER
-            and principal.principal_type == PrincipalType.HUMAN
-            and permission in RESEARCHER_PERMISSIONS
-        ):
-            return True
-
-        elif (
-            grant.role == Role.SPECIALIST_AI
-            and principal.principal_type == PrincipalType.AI_SERVICE
-            and permission in SPECIALIST_AI_PERMISSIONS
-        ):
-            return True
-
-        elif (
-            grant.role == Role.COORDINATOR_AI
-            and principal.principal_type == PrincipalType.AI_SERVICE
-            and permission in COORDINATOR_PERMISSIONS
-        ):
-            return True
+                if (
+                    permission_grant.active
+                    and permission_grant.permission == permission
+                    and (
+                        permission_grant.library_id is None
+                        or permission_grant.library_id == library_id
+                    )
+                    and permission in ADMINISTRATOR_GRANTABLE_PERMISSIONS
+                ):
+                    return True
 
     return False
