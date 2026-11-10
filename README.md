@@ -9,7 +9,7 @@ The full product vision and requirements live in the separate [CorePath reposito
 | Location | Contents |
 |---|---|
 | [backend/](backend/README.md) | API setup, configuration, endpoints and tests |
-| [database/migrations/](database/migrations/) | Six ordered PostgreSQL migrations |
+| [database/migrations/](database/migrations/) | Seven ordered PostgreSQL migrations |
 | [frontend/](frontend/README.md) | Static, interactive design prototype |
 | [docs/](docs/README.md) | Architecture, data model, decisions and implementation status |
 | [CI workflow](.github/workflows/knowledge-infrastructure-ci.yml) | Migration, seed, test, lint and format checks |
@@ -24,7 +24,7 @@ The full product vision and requirements live in the separate [CorePath reposito
 - Liveness and database-readiness endpoints.
 - Explicit database migration runner with history, checksum validation and transactional application.
 
-The frontend uses illustrative data and does not save form submissions or call the API. Source ingestion, retrieval, research automation, production authentication and deployment remain unfinished. See [implementation status](docs/knowledge-infrastructure/implementation-status.md) for evidence and the next implementation sequence.
+The frontend uses illustrative data and does not save form submissions or call the API. Source ingestion, research scheduling, production authentication and deployment remain unfinished. The separate [specialist runtime](specialists/README.md) implements bounded library retrieval and draft research execution; it is not connected to the prototype. See [implementation status](docs/knowledge-infrastructure/implementation-status.md) for evidence and the next implementation sequence.
 
 For ongoing development, start with the [build handover](docs/HANDOVER.md) and [deployment procedure](docs/knowledge-infrastructure/deployment.md).
 
@@ -36,9 +36,15 @@ The first [Life Profile service](life-profile/README.md) is implemented separate
 
 This code does not make the bot operational in the Founder portal. A separate database, encryption key, trusted Personal AI identity gateway and configured model are required; no live personal data or model requests were used to test it.
 
+## Eleven specialist bots
+
+The [specialist network](specialists/README.md) implements eleven distinct discipline briefs, library-scoped research, quoted evidence, draft findings, signed service capabilities, database permissions and request limits. Coordinator dispatch and own-domain independent research are separate operations. Collaboration requests are recorded for Coordinator review; peer calls are not executed. It has no Life Profile access or member-facing chat.
+
+A model connection, trusted machine-identity gateway, approved extracted sources and deployment are still required. Synthetic tests and HTTP mocks do not establish live model quality.
+
 ## Local development
 
-Use Python 3.11 or newer. Follow the [backend setup](backend/README.md#local-setup) to create a virtual environment and install the API. PostgreSQL is optional for liveness checks and database-independent tests; the source-registry integration test requires a disposable database with all six migrations applied.
+Use Python 3.11 or newer. Follow the [backend setup](backend/README.md#local-setup) to create a virtual environment and install the API. PostgreSQL is optional for liveness checks and database-independent tests; the source-registry integration test requires a disposable database with all seven migrations applied.
 
 Open [frontend/index.html](frontend/index.html) in a browser to explore the independent design prototype. No frontend build tools are required.
 

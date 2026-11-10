@@ -17,7 +17,7 @@ The immediate build is the shared knowledge foundation for eleven specialist dom
 
 ## Current continuation
 
-The founder has prioritised the **Life Profiling bot first**, supplying `Life Profile.docx` as requirements input. The first [profile service](../life-profile/README.md) and [source-document requirements review](life-profile/requirements.md) now define that continuation. It is a separate service/database, with signed Personal AI capabilities, encrypted profile data, consented model analysis, owner review/correction and controlled sharing. This changes the immediate bot build order; it does not discard the remaining eleven-specialist architecture.
+The founder first prioritised the **Life Profiling bot**, supplying `Life Profile.docx` as requirements input. The first [profile service](../life-profile/README.md) and [source-document requirements review](life-profile/requirements.md) now define that continuation. It is a separate service/database, with signed Personal AI capabilities, encrypted profile data, consented model analysis, owner review/correction and controlled sharing. This changes the immediate bot build order; it does not discard the remaining eleven-specialist architecture.
 
 The model, trusted identity gateway and profile deployment are not configured by this code. The hosted Founder portal remains a separate private workspace, without a live profile conversation interface. Confirm the Life Profile continuation commit's actual CI results before claiming its tests pass.
 
@@ -29,14 +29,22 @@ A supporting foundation task is also implemented here: tracked database migratio
 
 - `python -m app.migrations` applies pending files with transactional history, checksums and a shared runner lock.
 - `--check` reports pending work without database writes.
-- All six existing migrations are preserved. Existing untracked databases require a reviewed adoption plan.
+- The original six migrations are preserved; migration 007 adds specialist run tracking and section search. Existing untracked databases require a reviewed adoption plan.
 - CI now uses the runner twice and checks for pending migrations before running the API tests. New tests exercise repeat runs, changed/missing history, rollback and preservation of untracked data in isolated test schemas.
 
 Use the exact continuation commit's CI result to confirm these additions. The verified baseline above is not evidence that a later commit or a production deployment passed.
 
+### Eleven-specialist continuation
+
+The founder then requested all eleven specialist bots. The [specialist runtime](../specialists/README.md) implements all established domains with separate briefs and library scopes, signed Coordinator dispatch and own-domain independent research, eligible-section retrieval, cited draft outputs, request quotas, replay protection and persisted run/audit records. Model output cannot publish accepted findings or execute peer requests. It has no Life Profile credentials or routes. Source verification does not establish claim truth; quotation matching is traceability, not entailment.
+
+This is a separate service over the knowledge database, using a dedicated restricted database login and the original internal `service_identities` / `access_permissions` tables. It does not complete the human principal/action loader or replace the knowledge API's temporary bearer guard. Gateway issuance, source ingestion/model-use approval, live model evaluations, scheduling and collaboration handoffs remain unfinished. No live model or deployment is established. The latest continuation CI must be checked before describing its tests as passed.
+
+The owner-private Founder site has also been redesigned around a social home; it remains a separate preview with example content and local interactions, without live social or knowledge-backend integration.
+
 ## Next implementation sequence
 
-**Current first-bot priority:** complete the Life Profile model connection and evaluations, separate deployment, trusted Personal AI gateway, and owner-facing consent/review controls. The broader sequence below remains relevant to the shared knowledge platform.
+**Current bot integration priority:** evaluate and configure the specialist models and trusted Coordinator gateway alongside the Life Profile service. Complete the Life Profile model connection and evaluations, separate deployment, trusted Personal AI gateway, and owner-facing consent/review controls. The broader sequence below remains relevant to the shared knowledge platform.
 
 1. Confirm the integrated test suite and permissions engine are stable.
 2. Select the production identity provider and implement secure administrator authentication and server-side sessions.

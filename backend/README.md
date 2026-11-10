@@ -58,7 +58,7 @@ Repeat application skips recorded files. The runner records filenames, versions 
 
 `--check` is read-only: exit code 0 means up to date, 1 means valid pending migrations and 2 means an error. Applying migrations returns 0 on success and 2 on error. Use `--directory /path/to/release/migrations` when SQL files are stored outside the default checkout layout.
 
-The six existing migration files remain unchanged:
+The original six migration files remain unchanged; version 007 extends the release:
 
 | Version | Purpose |
 |---|---|
@@ -68,6 +68,7 @@ The six existing migration files remain unchanged:
 | 004 | Human/AI principals and role assignments |
 | 005 | Executive Administrator role |
 | 006 | Delegated administrator action grants |
+| 007 | Specialist run records, execution leases and English section-search index |
 
 Migrations are explicitly run, not executed during API startup. If an existing database was set up by running SQL directly, the runner refuses to automatically baseline it. Do not drop data or fabricate history to get past that check; use a reviewed adoption plan. Applied files must never be edited. See the [deployment procedure](../docs/knowledge-infrastructure/deployment.md) for release, backup, recovery and existing-database handling.
 
@@ -102,6 +103,10 @@ Database-dependent tests skip when `DATABASE_URL` is absent from the process env
 
 The [GitHub Actions workflow](../.github/workflows/knowledge-infrastructure-ci.yml) provisions PostgreSQL, applies migrations, validates seed data and runs the full suite and code checks.
 
+## Separate specialist runtime
+
+All eleven [specialists](../specialists/README.md) run in `specialists.main:app` on a separate port/process. Their signed Coordinator/specialist capabilities and database service grants do not upgrade this knowledge API's shared-token routes. Use a distinct least-privilege runtime database login. They retrieve only eligible prepared sections and save review-required drafts, with no profile access, member chat or peer execution.
+
 ## Current limitations
 
-The API does not yet implement source ingestion, retrieval, research execution, production identity and sessions, endpoint-level role authorisation or production deployment. The [frontend](../frontend/README.md) remains a separate demonstration. See [implementation status](../docs/knowledge-infrastructure/implementation-status.md) for verified evidence and remaining work.
+The knowledge API does not yet implement source ingestion, production identity and sessions, human endpoint-level role authorisation or production deployment. The separate specialist service provides initial scoped retrieval and draft execution; live model quality remains unverified. The [frontend](../frontend/README.md) remains a separate demonstration. See [implementation status](../docs/knowledge-infrastructure/implementation-status.md) for verified evidence and remaining work.

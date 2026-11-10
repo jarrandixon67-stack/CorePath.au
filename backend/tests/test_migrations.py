@@ -18,7 +18,7 @@ def write_migration(directory: Path, name: str, body: str) -> Path:
 
 def test_loads_existing_release_without_changing_sql_files():
     migrations = load_migrations(DEFAULT_DIRECTORY)
-    assert [m.version for m in migrations] == [1, 2, 3, 4, 5, 6]
+    assert [m.version for m in migrations] == [1, 2, 3, 4, 5, 6, 7]
     for migration in migrations:
         data = (DEFAULT_DIRECTORY / migration.filename).read_bytes()
         assert migration.checksum == hashlib.sha256(data).hexdigest()
@@ -71,12 +71,12 @@ def migration_database():
             connection.execute(sql.SQL("DROP SCHEMA {} CASCADE").format(sql.Identifier(schema)))
 
 
-def test_existing_six_migrations_apply_once_and_preserve_seed_counts(migration_database):
+def test_existing_migrations_apply_once_and_preserve_seed_counts(migration_database):
     migrations = load_migrations(DEFAULT_DIRECTORY)
-    assert len(migrate(migration_database, migrations)) == 6
+    assert len(migrate(migration_database, migrations)) == 7
     assert migrate(migration_database, migrations) == []
     assert migrate(migration_database, migrations, check_only=True) == []
-    assert migration_database.execute("SELECT count(*) FROM schema_migrations").fetchone()[0] == 6
+    assert migration_database.execute("SELECT count(*) FROM schema_migrations").fetchone()[0] == 7
     assert migration_database.execute("SELECT count(*) FROM specialist_domains").fetchone()[0] == 11
     assert (
         migration_database.execute("SELECT count(*) FROM knowledge_libraries").fetchone()[0] == 11

@@ -2,6 +2,7 @@
 
 | Document | Purpose |
 |---|---|
+| [Eleven specialist bots](../specialists/README.md) | Roles, bounded research, gateway capabilities, permissions and remaining integration |
 | [Life Profile bot requirements](life-profile/requirements.md) | Source-document decisions, first implementation and remaining boundaries |
 | [Life Profile service setup](../life-profile/README.md) | Separate database, encrypted storage, API and model configuration |
 | [Platform build brief](COREPATH-PLATFORM.md) | Founder-supplied philosophy, architecture, governance and priorities |

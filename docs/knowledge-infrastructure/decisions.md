@@ -105,3 +105,13 @@
 **Reason:** Make repeat releases auditable, prevent reapplying or silently changing completed migrations, and ensure failures do not leave partially applied batches. Existing databases created through direct SQL need separately reviewed adoption; no reset or automatic downgrade is provided. New SQL files must remain transactional, with one outer BEGIN/COMMIT wrapper and no internal transaction-control statements.
 
 **Verification:** CI uses the runner twice, checks for pending work, validates specialist seeds and runs regression tests in isolated test schemas. See the [deployment procedure](deployment.md) and exact commit's CI result.
+
+
+## D-013: Bounded specialist execution with traceable drafts
+
+**Status:** Implemented first runtime; operational integration pending.
+**Decision:** Implement the eleven existing domains as distinct briefs and scopes over one shared runtime/model adapter. Use a separate internal service with short-lived signed Coordinator or own-domain specialist capabilities, active database service identities and explicit retrieval/research grants. Keep its database login separate from schema ownership and the Life Profile service. The original internal service grants are not a replacement for the pending human principal/action integration.
+
+Retrieve only prepared, verified, active and explicitly model-use-approved library excerpts. Validate exact quotation/reference provenance and record model output as review-required draft runs; do not publish accepted knowledge or treat source verification as scientific truth. Record collaboration requests without peer execution. Recheck access and evidence before saving. Transactional per-service quotas, single-use starts and execution leases bound work and recover abandoned concurrency.
+
+**Reason:** Make the bots runnable and testable while preserving profile separation, intellectual independence, Coordinator authority and honest evidence limits. Keyword retrieval, prompts and mocks are a starting point; real model evaluations, licensed ingestion, gateway deployment and collaboration handoffs remain necessary. See the [specialist service](../../specialists/README.md).
