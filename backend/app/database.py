@@ -17,5 +17,5 @@ def create_pool(settings: Settings) -> ConnectionPool | None:
         min_size=settings.db_pool_min_size,
         max_size=settings.db_pool_max_size,
         open=False,
-        kwargs={"autocommit": True},
+        kwargs={"autocommit": False},
     )

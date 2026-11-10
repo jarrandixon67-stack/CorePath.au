@@ -1,4 +1,3 @@
-# ruff: noqa: I001
 from datetime import date
 from typing import Any, Literal
 from uuid import UUID
@@ -34,6 +33,19 @@ class SourceCreate(BaseModel):
     access_notes: str | None = Field(default=None, max_length=4000)
     relationship_note: str = Field(default="", max_length=2000)
     source_metadata: dict[str, Any] = Field(default_factory=dict)
+    category_id: UUID | None = None
+
+
+class CategoryCreate(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+
+    name: str = Field(min_length=1, max_length=150)
+    description: str = Field(default="", max_length=1000)
+
+
+class VerificationUpdate(BaseModel):
+    verification_status: Literal["unverified", "under_review", "verified", "rejected"]
+    verification_notes: str = Field(default="", max_length=4000)
 
 
 class SourceResponse(BaseModel):
