@@ -71,3 +71,22 @@ Repository commits are not equivalent to deployed infrastructure. No production 
 - [x] Life Profile and Coordinator/specialist orchestration boundaries explicitly excluded from automatic Executive Administrator access.
 
 **Next implementation work:** implement a permission catalogue and role-grant checks in the API; add tests proving that each role can perform only its permitted actions and library scopes. Keep the shared bearer token as a temporary development-only guard until a trusted identity provider and server-side session are in place.
+
+
+## Action-level authorisation foundation
+
+- [x] Deny-by-default policy evaluator for active principals and active role grants.
+- [x] Founder and Executive Administrator permission boundaries.
+- [x] Explicit action grants for administrators, with optional library scope.
+- [x] Specialist researcher and specialist AI library isolation.
+- [x] Coordinator-only specialist task dispatch permissions.
+- [x] Explicit denial of Life Profile access through the knowledge API permission catalogue.
+- [x] PostgreSQL migration for revocable administrator action grants.
+- [x] Unit tests for role boundaries and library scope.
+- [x] Database integration tests for grant constraints.
+- [ ] Trusted identity provider and secure server-side sessions.
+- [ ] Load authenticated principals and grants from PostgreSQL.
+- [ ] Apply permission dependencies to every protected API route.
+- [ ] Add endpoint-level allow/deny tests for each role and action.
+
+**Boundary:** The policy evaluator is a tested foundation, not yet active HTTP route enforcement. The current shared bearer token does not identify a human or AI principal. Do not expose the internal-token API as a production user-facing service until identity and per-request authorisation are connected.
