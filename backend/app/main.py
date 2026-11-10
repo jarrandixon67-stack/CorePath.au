@@ -10,12 +10,11 @@ from app.database import create_pool
 from app.schemas import CategoryCreate, SourceCreate, VerificationUpdate
 from app.security import require_internal_token
 from app.source_service import (
-    CategoryNotFoundError,
     LibraryNotFoundError,
     SourceNotFoundError,
-    link_existing_source,
     create_library_category,
     get_library_overview,
+    link_existing_source,
     list_libraries,
     list_library_sources,
     register_library_source,
