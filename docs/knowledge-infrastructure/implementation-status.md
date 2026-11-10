@@ -62,3 +62,12 @@
 ## Important boundary
 
 Repository commits are not equivalent to deployed infrastructure. No production API, database, research automation or AI specialist is considered operational until separately provisioned, deployed and tested.
+
+
+## Access governance decisions
+
+- [x] Executive Administrator positioned directly below Founder, with Founder-reserved powers.
+- [x] Action-level permission boundaries documented separately from role names.
+- [x] Life Profile and Coordinator/specialist orchestration boundaries explicitly excluded from automatic Executive Administrator access.
+
+**Next implementation work:** implement a permission catalogue and role-grant checks in the API; add tests proving that each role can perform only its permitted actions and library scopes. Keep the shared bearer token as a temporary development-only guard until a trusted identity provider and server-side session are in place.
