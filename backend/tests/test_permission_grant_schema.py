@@ -11,8 +11,7 @@ def test_permission_grants_are_limited_to_human_administrator_roles() -> None:
     if not database_url:
         pytest.skip("DATABASE_URL is not configured")
 
-    with psycopg.connect(database_url) as connection:
-        with connection.cursor() as cursor:
+    with psycopg.connect(database_url) as connection, connection.cursor() as cursor:
             administrator_id = uuid4()
             cursor.execute(
                 """
