@@ -29,6 +29,9 @@
 - [x] Initial human and AI principal registry with library-scoped researcher and specialist-AI role grants.
 - [x] Database guard enforcing human versus AI service role types.
 - [x] CI migration validation for identity and access schema.
+- [x] Founder and Executive Administrator hierarchy added to the role schema.
+- [x] Executive Administrator role constrained to a global human principal.
+- [x] CI applies and validates the Executive Administrator migration.
 
 ## Not yet verified
 
