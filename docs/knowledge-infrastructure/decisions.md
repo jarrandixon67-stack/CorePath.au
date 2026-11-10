@@ -71,3 +71,27 @@
 **Executive Administrator scope:** Global operational oversight, user and researcher administration, library and source management, research oversight, and delegated approval of knowledge publication and verification. The Founder may narrow or revoke these permissions. The role does not automatically grant access to Life Profile data or private user conversations; those remain separately controlled boundaries.
 
 **Security:** The role is assigned only to a named, individually authenticated human principal. It must not be shared as a generic account. All privileged actions are audited, and sensitive changes should require re-authentication and, where appropriate, a second approval.
+
+
+## D-011: Separate role hierarchy from action-level permissions
+
+**Status:** Accepted  
+**Decision:** A role identifies a person's organisational authority, but does not by itself grant unrestricted access to every operation or dataset. Enforce explicit action permissions and data boundaries server-side.
+
+| Action | Founder | Executive Administrator | Administrator | Specialist researcher |
+|---|---|---|---|---|
+| View operational dashboard | Yes | Yes | Delegated | No, unless needed |
+| Manage ordinary users and researcher invitations | Yes | Yes | Delegated | No |
+| Create, edit and organise knowledge sources | Yes | Yes | Delegated | Within assigned library, as granted |
+| Review and verify sources | Yes | Yes, delegated | Delegated | Submit review only by default |
+| Approve/publish accepted research findings | Yes | Yes, delegated | Delegated | Submit proposals only |
+| Manage role grants below own authority | Yes | Yes, delegated | Only if explicitly granted | No |
+| Appoint/remove Executive Administrator | Yes | No | No | No |
+| Change Founder-reserved powers or transfer ownership | Yes | No | No | No |
+| Access Life Profile records or private conversations | Only through separately authorised systems and purpose | No automatic access | No automatic access | No |
+| Access specialist AI runtime or issue cross-specialist tasks | Through approved governance controls | Operational oversight only; not an alternate Coordinator | No | No |
+| Direct specialist-to-specialist communication | Only through Coordinator-authorised workflow | No bypass | No bypass | No bypass |
+
+**Executive Administrator limits:** This role is broad but delegated. It may manage ordinary administrators, researcher accounts, library operations and research workflows. It cannot appoint or remove the Founder or Executive Administrator, alter Founder-reserved powers, transfer ownership, bypass the Coordinator's specialist orchestration boundary, or gain Life Profile access merely by rank.
+
+**Permission implementation:** Represent permissions as explicit actions (for example library.source.create, library.source.verify, research.finding.publish, access.user.manage, access.role.grant, platform.settings.manage). Each request must be checked against the authenticated principal, active role grant, scope, resource and action. Record privileged grants and decisions in an append-only audit trail. Deny by default.
