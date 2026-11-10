@@ -55,17 +55,23 @@ def get_library_overview(pool: ConnectionPool, library_id: UUID) -> dict:
               count(DISTINCT link.source_id)::integer AS registered_sources,
               count(DISTINCT link.source_id) FILTER (
                 WHERE source.verification_status = 'verified'
-              )::integer AS verified_records,
-              count(DISTINCT finding.id) FILTER (
-                WHERE finding.status = 'accepted'
-              )::integer AS research_findings
+              )::integer AS verified_records
             FROM source_library_links link
             JOIN knowledge_sources source ON source.id = link.source_id
-            LEFT JOIN specialist_domains domain ON domain.id = %s
-            LEFT JOIN research_findings finding ON finding.domain_id = domain.id
             WHERE link.library_id = %s
             """,
-            (library["domain_slug"], library_id),
+            (library_id,),
+            row_factory=dict_row,
+        ).fetchone()
+
+        findings = conn.execute(
+            """
+            SELECT count(*)::integer AS research_findings
+            FROM research_findings finding
+            JOIN knowledge_libraries library ON library.domain_id = finding.domain_id
+            WHERE library.id = %s AND finding.status = 'accepted'
+            """,
+            (library_id,),
             row_factory=dict_row,
         ).fetchone()
 
@@ -83,7 +89,7 @@ def get_library_overview(pool: ConnectionPool, library_id: UUID) -> dict:
             row_factory=dict_row,
         ).fetchall()
 
-        return {**library, **counts, "categories": categories}
+        return {**library, **counts, **findings, "categories": categories}
 
 
 def list_library_sources(pool: ConnectionPool, library_id: UUID) -> list[dict]:
