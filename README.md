@@ -48,6 +48,12 @@ The [Coordinator service](coordinator/README.md) accepts signed general-research
 
 The model, trusted gateways/exchange, Personal AI client and hosting still require configuration and live evaluation. Automated tests use synthetic evidence and model doubles; they do not certify reasoning quality.
 
+## Persy — Personal AI
+
+[Persy](persy/README.md) is the first member-facing Personal AI service. It supports optional encrypted conversation history, explicit communication preferences, optional approved profile context, reviewed research handoffs and owner-controlled Life Profile analysis/review/decisions. Private conversations use their own third database, outside knowledge and Life Profile storage.
+
+Persy is not connected to the Founder preview site. Live model quality, trusted member sign-in/exchange, frontend consent/chat controls and deployment remain pending. Its [evaluation scenarios](persy/evaluation.md) describe further review without claiming it has occurred.
+
 ## Local development
 
 Use Python 3.11 or newer. Follow the [backend setup](backend/README.md#local-setup) to create a virtual environment and install the API. PostgreSQL is optional for liveness checks and database-independent tests; the source-registry integration test requires a disposable database with all eight migrations applied.

@@ -33,6 +33,7 @@ jobs:
     env:
       DATABASE_URL: postgresql://corepath:corepath-test@localhost:5432/corepath_test
       LIFE_PROFILE_DATABASE_URL: postgresql://corepath:corepath-test@localhost:5432/corepath_profiles_test
+      PERSY_DATABASE_URL: postgresql://corepath:corepath-test@localhost:5432/corepath_persy_test
 
     steps:
       - name: Check out repository
@@ -81,6 +82,14 @@ jobs:
           DATABASE_URL="$LIFE_PROFILE_DATABASE_URL" python -m app.migrations --directory ../life-profile/database/migrations
           DATABASE_URL="$LIFE_PROFILE_DATABASE_URL" python -m app.migrations --directory ../life-profile/database/migrations
           DATABASE_URL="$LIFE_PROFILE_DATABASE_URL" python -m app.migrations --directory ../life-profile/database/migrations --check
+
+      - name: Prepare isolated Persy conversation database
+        working-directory: backend
+        run: |
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c "CREATE DATABASE corepath_persy_test"
+          DATABASE_URL="$PERSY_DATABASE_URL" python -m app.migrations --directory ../persy/database/migrations
+          DATABASE_URL="$PERSY_DATABASE_URL" python -m app.migrations --directory ../persy/database/migrations
+          DATABASE_URL="$PERSY_DATABASE_URL" python -m app.migrations --directory ../persy/database/migrations --check
 
       - name: Run backend tests
         working-directory: backend

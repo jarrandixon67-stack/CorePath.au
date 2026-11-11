@@ -112,6 +112,10 @@ All eleven [specialists](../specialists/README.md) run in `specialists.main:app`
 
 The separate [Coordinator](../coordinator/README.md) runs as `coordinator.main:app` on port 8003, with its own signed Personal AI capabilities and restricted database account. It plans research, calls the specialist service through a trusted token-exchange contract and returns traceable draft reports. `python -m coordinator.evaluate` validates synthetic routing fixtures; only an explicitly configured `--live` run calls a model. Neither service upgrades the knowledge API's shared-token routes or provisions human identity.
 
+## Persy Personal AI
+
+The separate [Persy service](../persy/README.md) runs as `persy.main:app` on port 8004, with member-bound capabilities and a third private PostgreSQL database. Its migration is in `persy/database/migrations/`, not the knowledge release. It never receives Life Profile or knowledge database credentials. It provides optional encrypted conversation history, owner controls and reviewed service handoffs. The full test suite now also needs `PERSY_DATABASE_URL` pointing to a separate disposable `*_test` database.
+
 ## Current limitations
 
 The knowledge API does not yet implement source ingestion, production identity and sessions, human endpoint-level role authorisation or production deployment. The separate specialist service provides initial scoped retrieval and draft execution; live model quality remains unverified. The [frontend](../frontend/README.md) remains a separate demonstration. See [implementation status](../docs/knowledge-infrastructure/implementation-status.md) for verified evidence and remaining work.
