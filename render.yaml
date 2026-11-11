@@ -1,0 +1,115 @@
+# Initial live test: Percy, coordinator, all eleven specialists and a trusted exchange.
+# No automatic production changes; database owners are never service runtime logins.
+services:
+- type: web
+  name: corepath-percy
+  runtime: docker
+  plan: starter
+  region: singapore
+  dockerfilePath: ./deployment/Dockerfile
+  dockerContext: .
+  dockerCommand: sh -c 'uvicorn persy.main:app --host 0.0.0.0 --port "$PORT" --no-access-log'
+  healthCheckPath: /health/live
+  autoDeployTrigger: 'off'
+  envVars:
+  - key: PERSY_DATABASE_URL
+    sync: false
+  - key: PERSY_ENCRYPTION_KEY
+    sync: false
+  - key: PERSY_GATEWAY_PUBLIC_KEY
+    sync: false
+  - key: PERSY_EXCHANGE_URL
+    sync: false
+  - key: PERSY_EXCHANGE_TOKEN
+    sync: false
+  - key: PERSY_COORDINATOR_URL
+    sync: false
+  - key: PERSY_COORDINATOR_PUBLIC_KEY
+    sync: false
+  - key: PERSY_MODEL
+    sync: false
+  - key: PERSY_OPENAI_API_KEY
+    sync: false
+- type: web
+  name: corepath-coordinator
+  runtime: docker
+  plan: starter
+  region: singapore
+  dockerfilePath: ./deployment/Dockerfile
+  dockerContext: .
+  dockerCommand: sh -c 'uvicorn coordinator.main:app --host 0.0.0.0 --port "$PORT"
+    --no-access-log'
+  healthCheckPath: /health/live
+  autoDeployTrigger: 'off'
+  envVars:
+  - key: COORDINATOR_DATABASE_URL
+    sync: false
+  - key: COORDINATOR_GATEWAY_PUBLIC_KEY
+    sync: false
+  - key: COORDINATOR_SPECIALIST_URL
+    sync: false
+  - key: COORDINATOR_EXCHANGE_URL
+    sync: false
+  - key: COORDINATOR_EXCHANGE_TOKEN
+    sync: false
+  - key: COORDINATOR_SPECIALIST_PUBLIC_KEY
+    sync: false
+  - key: COORDINATOR_MODEL
+    sync: false
+  - key: COORDINATOR_OPENAI_API_KEY
+    sync: false
+- type: web
+  name: corepath-specialists
+  runtime: docker
+  plan: starter
+  region: singapore
+  dockerfilePath: ./deployment/Dockerfile
+  dockerContext: .
+  dockerCommand: sh -c 'uvicorn specialists.main:app --host 0.0.0.0 --port "$PORT"
+    --no-access-log'
+  healthCheckPath: /health/live
+  autoDeployTrigger: 'off'
+  envVars:
+  - key: SPECIALISTS_DATABASE_URL
+    sync: false
+  - key: SPECIALISTS_GATEWAY_PUBLIC_KEY
+    sync: false
+  - key: SPECIALISTS_MODEL
+    sync: false
+  - key: SPECIALISTS_OPENAI_API_KEY
+    sync: false
+- type: web
+  name: corepath-exchange
+  runtime: docker
+  plan: starter
+  region: singapore
+  dockerfilePath: ./deployment/Dockerfile
+  dockerContext: .
+  dockerCommand: sh -c 'uvicorn service_gateway.main:app --host 0.0.0.0 --port "$PORT"
+    --no-access-log'
+  healthCheckPath: /health/live
+  autoDeployTrigger: 'off'
+  envVars:
+  - key: EXCHANGE_SIGNING_PRIVATE_KEY
+    sync: false
+  - key: EXCHANGE_MEMBER_PUBLIC_KEY
+    sync: false
+  - key: EXCHANGE_PERCY_MACHINE_TOKEN
+    sync: false
+  - key: EXCHANGE_COORDINATOR_MACHINE_TOKEN
+    sync: false
+  - key: EXCHANGE_ALLOWED_MEMBER_SUBJECT
+    sync: false
+databases:
+- name: corepath-knowledge
+  plan: basic-256mb
+  region: singapore
+  databaseName: corepath_knowledge
+  postgresMajorVersion: '16'
+  ipAllowList: []
+- name: corepath-conversations
+  plan: basic-256mb
+  region: singapore
+  databaseName: corepath_conversations
+  postgresMajorVersion: '16'
+  ipAllowList: []

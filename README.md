@@ -65,3 +65,7 @@ Open [frontend/index.html](frontend/index.html) in a browser to explore the inde
 The API currently uses a temporary shared internal bearer token. Keep credentials out of Git and browser JavaScript. The schema's role records do not yet enforce user or library permissions in the API. External access requires the identity, session and authorisation work described in the [architecture](docs/knowledge-infrastructure/architecture.md).
 
 Repository commits and passing tests do not establish production deployment or readiness. Keep individual Life Profile data outside this knowledge repository.
+
+## Render live-test deployment
+
+See [the deployment instructions](deployment/README.md) and `render.yaml` for the initial Percy → Coordinator → eleven-specialist chain. The new `service_gateway` package implements the limited research/dispatch token exchange required by those existing services. It does not enable profile access or deploy resources automatically. Hosting approval, restricted database provisioning, secret configuration, model access and live evaluation are still required.
