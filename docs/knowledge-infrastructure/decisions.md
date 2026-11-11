@@ -115,3 +115,13 @@
 Retrieve only prepared, verified, active and explicitly model-use-approved library excerpts. Validate exact quotation/reference provenance and record model output as review-required draft runs; do not publish accepted knowledge or treat source verification as scientific truth. Record collaboration requests without peer execution. Recheck access and evidence before saving. Transactional per-service quotas, single-use starts and execution leases bound work and recover abandoned concurrency.
 
 **Reason:** Make the bots runnable and testable while preserving profile separation, intellectual independence, Coordinator authority and honest evidence limits. Keyword retrieval, prompts and mocks are a starting point; real model evaluations, licensed ingestion, gateway deployment and collaboration handoffs remain necessary. See the [specialist service](../../specialists/README.md).
+
+
+## D-014: Internal Coordinator with bounded, reviewable orchestration
+
+**Status:** Implemented first service; operational integration/evaluation pending.
+**Decision:** Accept only signed Personal AI general-research requests with active database `personal_ai` service identity and explicit global `coordinate` grant. Keep a distinct Coordinator identity and least-privilege database login without library or profile reads. Use a trusted external exchange for per-task Coordinator specialist capabilities; never put private signing keys or model-selected destinations in the runtime.
+
+Validate plans against allowed domains and call budgets before dispatch. Commit scoped task reservations first. Permit only one explicitly reviewed round of requested peer follow-ups, with no domain duplication or recursion. Validate synthesis references against actual task findings, cap reported confidence and preserve all specialist limitations/gaps/disagreements. Retain valid results on partial model/service failure without fabricating a synthesis.
+
+**Reason:** Make coordination executable and accountable while preserving the Personal AI interface, exclusive Life Profile access, independent specialists and technical permission boundaries. Structural tests and routing fixtures are not evidence of real model reasoning quality. Gateway deployment, live evaluations, ingestion and operational recovery remain separate work. See the [Coordinator service](../../coordinator/README.md).

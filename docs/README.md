@@ -2,6 +2,7 @@
 
 | Document | Purpose |
 |---|---|
+| [Coordinator bot](../coordinator/README.md) | Planning, controlled collaboration, cited synthesis, service identity and evaluation |
 | [Eleven specialist bots](../specialists/README.md) | Roles, bounded research, gateway capabilities, permissions and remaining integration |
 | [Life Profile bot requirements](life-profile/requirements.md) | Source-document decisions, first implementation and remaining boundaries |
 | [Life Profile service setup](../life-profile/README.md) | Separate database, encrypted storage, API and model configuration |

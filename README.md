@@ -9,7 +9,7 @@ The full product vision and requirements live in the separate [CorePath reposito
 | Location | Contents |
 |---|---|
 | [backend/](backend/README.md) | API setup, configuration, endpoints and tests |
-| [database/migrations/](database/migrations/) | Seven ordered PostgreSQL migrations |
+| [database/migrations/](database/migrations/) | Eight ordered PostgreSQL migrations |
 | [frontend/](frontend/README.md) | Static, interactive design prototype |
 | [docs/](docs/README.md) | Architecture, data model, decisions and implementation status |
 | [CI workflow](.github/workflows/knowledge-infrastructure-ci.yml) | Migration, seed, test, lint and format checks |
@@ -38,13 +38,19 @@ This code does not make the bot operational in the Founder portal. A separate da
 
 ## Eleven specialist bots
 
-The [specialist network](specialists/README.md) implements eleven distinct discipline briefs, library-scoped research, quoted evidence, draft findings, signed service capabilities, database permissions and request limits. Coordinator dispatch and own-domain independent research are separate operations. Collaboration requests are recorded for Coordinator review; peer calls are not executed. It has no Life Profile access or member-facing chat.
+The [specialist network](specialists/README.md) implements eleven distinct discipline briefs, library-scoped research, quoted evidence, draft findings, signed service capabilities, database permissions and request limits. Coordinator dispatch and own-domain independent research are separate operations. Specialists record collaboration requests for Coordinator review and never contact peers directly. It has no Life Profile access or member-facing chat.
 
 A model connection, trusted machine-identity gateway, approved extracted sources and deployment are still required. Synthetic tests and HTTP mocks do not establish live model quality.
 
+## Coordinator bot
+
+The [Coordinator service](coordinator/README.md) accepts signed general-research requests from the Personal AI, chooses a bounded specialist team, authorises eligible follow-ups and consolidates cited draft findings. It preserves specialist disagreements and gaps, caps confidence at supporting findings and reports partial failures. Its restricted database role cannot read libraries or Life Profiles directly.
+
+The model, trusted gateways/exchange, Personal AI client and hosting still require configuration and live evaluation. Automated tests use synthetic evidence and model doubles; they do not certify reasoning quality.
+
 ## Local development
 
-Use Python 3.11 or newer. Follow the [backend setup](backend/README.md#local-setup) to create a virtual environment and install the API. PostgreSQL is optional for liveness checks and database-independent tests; the source-registry integration test requires a disposable database with all seven migrations applied.
+Use Python 3.11 or newer. Follow the [backend setup](backend/README.md#local-setup) to create a virtual environment and install the API. PostgreSQL is optional for liveness checks and database-independent tests; the source-registry integration test requires a disposable database with all eight migrations applied.
 
 Open [frontend/index.html](frontend/index.html) in a browser to explore the independent design prototype. No frontend build tools are required.
 

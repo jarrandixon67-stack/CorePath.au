@@ -25,7 +25,10 @@ dev = [
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["app*", "life_profile*", "specialists*"]
+include = ["app*", "life_profile*", "specialists*", "coordinator*"]
+
+[tool.setuptools.package-data]
+coordinator = ["evaluation_cases.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

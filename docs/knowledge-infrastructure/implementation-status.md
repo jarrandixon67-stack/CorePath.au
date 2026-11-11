@@ -49,9 +49,25 @@ Use the [CI workflow](../../.github/workflows/knowledge-infrastructure-ci.yml) a
 - [x] Migration 007 and restricted runtime database-role template.
 - [ ] Real model quality evaluation and trusted machine-identity gateway/Coordinator integration.
 - [ ] Deployed specialist service and licensed ingestion/review workflow.
-- [ ] Scheduling, multilingual/semantic retrieval, evidence acceptance/versioning and approved collaboration execution.
+- [ ] Scheduling, multilingual/semantic retrieval and evidence acceptance/versioning. Initial Coordinator-authorised follow-ups are implemented in the separate Coordinator service; live integration remains pending.
 
 See the [specialist setup and boundaries](../../specialists/README.md). The human knowledge API authorisation checklist below is separate and remains incomplete. Consult the exact continuation commit's CI before claiming validation.
+
+## Coordinator continuation
+
+- [x] Internal Personal AI-only research and requester-scoped status routes.
+- [x] Bounded specialist selection, clarification and one explicitly reviewed follow-up round.
+- [x] Fixed HTTPS specialist/exchange clients, signed-token binding and no private signing key.
+- [x] Cited synthesis, confidence capping and preserved source disagreements/gaps.
+- [x] Partial failure reports retain validated specialist results.
+- [x] Transactional task reservations, domain budgets, replay protection and run leases.
+- [x] Migration 008 and a restricted database-role template without source/profile access.
+- [x] Synthetic routing fixtures and an explicitly opt-in live model evaluation command.
+- [ ] Live model routing/synthesis evaluations and evidence review.
+- [ ] Trusted gateway/exchange, Personal AI client and hosted deployment.
+- [ ] Production reconciliation, background recovery, retention and monitoring.
+
+See the [Coordinator setup](../../coordinator/README.md). Tests and fixture validation do not establish live quality or operational deployment.
 
 ## Verification evidence
 
