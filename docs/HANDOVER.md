@@ -50,6 +50,14 @@ Migration 008 adds distinct `personal_ai` internal service identities and explic
 
 The eleven-specialist merge `805345b473f7769c0a5862e26a59dbd469b0765c` passed [main CI](https://github.com/jarrandixon67-stack/CorePath.au/actions/runs/42882608076), with 184 tests in its [PR CI](https://github.com/jarrandixon67-stack/CorePath.au/actions/runs/42882500074). Verify the Coordinator continuation's own CI before claiming its tests pass.
 
+### Persy continuation
+
+The founder named the Personal AI **Persy** and requested its implementation. The [Persy service](../persy/README.md) is the only member-facing AI interface. It adds explicit processing/history/profile-context choices, plain/balanced/detailed communication preferences, optional encrypted conversations, owner-bound member capabilities and reviewed research proposals. Only the exact stored question is sent after a separate owner approval. Profile use goes through the Life Profiling service; selected retained user messages can be analysed only through that service's existing consent and owner-review workflow. No profile observations are automatically confirmed or shared.
+
+Persy uses a third private database with its own migration and encryption key. Neither the knowledge nor profile schema is changed. Revocation/deletion checks prevent accepting an in-flight reply; old profile-assisted turns cannot silently restore withdrawn/changed profile context to future model requests. Payload-free operations/nonces/audits remain after chat erasure for replay and cost limits. Member UI, trusted identity/exchange, deployment and actual model quality remain unconfigured/unverified. [Evaluation scenarios](../persy/evaluation.md) are review requirements, not passing model evaluations.
+
+The Coordinator was merged as `951d89a09e7b143733fb6861c00e0742ab88a9b3`; its [PR CI](https://github.com/jarrandixon67-stack/CorePath.au/actions/runs/43116799528) passed 248 tests. Verify Persy's exact continuation CI before claiming its integrated tests pass.
+
 ## Next implementation sequence
 
 **Current bot integration priority:** evaluate and configure the specialist models and trusted Coordinator gateway alongside the Life Profile service. Complete the Life Profile model connection and evaluations, separate deployment, trusted Personal AI gateway, and owner-facing consent/review controls. The broader sequence below remains relevant to the shared knowledge platform.

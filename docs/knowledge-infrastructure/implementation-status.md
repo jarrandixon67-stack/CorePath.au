@@ -69,6 +69,20 @@ See the [specialist setup and boundaries](../../specialists/README.md). The huma
 
 See the [Coordinator setup](../../coordinator/README.md). Tests and fixture validation do not establish live quality or operational deployment.
 
+## Persy Personal AI continuation
+
+- [x] Member-bound conversation and privacy routes, distinct from internal service roles.
+- [x] Independent private database and encrypted owner/record/purpose-bound payloads.
+- [x] Optional history, explicit communication preferences and approved profile context.
+- [x] Revocation/deletion checks, history erasure and filtered use of old profile-assisted turns.
+- [x] Reviewed, encrypted, expiring and single-use general research proposals.
+- [x] Profile consent/review/decisions/deletion and selected-user-message analysis through the Life Profiling service.
+- [x] Scoped member/machine token-exchange contract, quotas and restricted database role.
+- [ ] Trusted member sessions/exchange, frontend controls and hosted deployment.
+- [ ] Live conversational/evidence/safety evaluation and operational key/retention/recovery policy.
+
+See [Persy setup](../../persy/README.md). Its private migration does not belong to the knowledge schema, and code tests do not establish model quality.
+
 ## Verification evidence
 
 The [cleanup merge run](https://github.com/jarrandixon67-stack/CorePath.au/actions/runs/42862635494) for commit `59ffc7006079e364b055300f1bcf19587ab2084a` passed. Its [PR run](https://github.com/jarrandixon67-stack/CorePath.au/actions/runs/42862486204) verified all eight original backend tests, all five original migrations, specialist seed data, lint and formatting.

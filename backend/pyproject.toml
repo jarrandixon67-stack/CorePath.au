@@ -25,7 +25,7 @@ dev = [
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["app*", "life_profile*", "specialists*", "coordinator*"]
+include = ["app*", "life_profile*", "specialists*", "coordinator*", "persy*"]
 
 [tool.setuptools.package-data]
 coordinator = ["evaluation_cases.json"]

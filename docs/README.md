@@ -2,6 +2,7 @@
 
 | Document | Purpose |
 |---|---|
+| [Persy Personal AI](../persy/README.md) | Member conversation, optional memory, profile controls and reviewed research |
 | [Coordinator bot](../coordinator/README.md) | Planning, controlled collaboration, cited synthesis, service identity and evaluation |
 | [Eleven specialist bots](../specialists/README.md) | Roles, bounded research, gateway capabilities, permissions and remaining integration |
 | [Life Profile bot requirements](life-profile/requirements.md) | Source-document decisions, first implementation and remaining boundaries |

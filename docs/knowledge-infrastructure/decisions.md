@@ -125,3 +125,13 @@ Retrieve only prepared, verified, active and explicitly model-use-approved libra
 Validate plans against allowed domains and call budgets before dispatch. Commit scoped task reservations first. Permit only one explicitly reviewed round of requested peer follow-ups, with no domain duplication or recursion. Validate synthesis references against actual task findings, cap reported confidence and preserve all specialist limitations/gaps/disagreements. Retain valid results on partial model/service failure without fabricating a synthesis.
 
 **Reason:** Make coordination executable and accountable while preserving the Personal AI interface, exclusive Life Profile access, independent specialists and technical permission boundaries. Structural tests and routing fixtures are not evidence of real model reasoning quality. Gateway deployment, live evaluations, ingestion and operational recovery remain separate work. See the [Coordinator service](../../coordinator/README.md).
+
+
+## D-015: Persy with owner-controlled conversation and service delegation
+
+**Status:** Implemented first member-facing backend; live evaluation/deployment pending.
+**Decision:** Keep Persy's optional encrypted conversation history in a third private database. Require verified member subjects, explicit model-processing consent, separate opt-in retention/profile context, optimistic privacy revisions and per-operation replay/cost limits. Bind ciphertext to owner/record/purpose. Keep private signing keys and Life Profile/knowledge database credentials out of Persy.
+
+Use the dedicated Life Profiling service for accepted/shared context and explicit owner analysis/review/decisions. Send selected retained user messages only; never profile automatically. Prevent old profile-assisted turns from silently restoring withdrawn context. Require review and approval of an encrypted, expiring research proposal before sending its exact general question to the Coordinator. Delegate via a fixed trusted exchange with target/action, member and machine-subject binding. Render research from validated findings/citations, without inventing replacement facts.
+
+**Reason:** Make the Personal AI useful while preserving owner choice, private-data boundaries, evidence and human independence. Gateways, UI, provider retention, live-model safety/quality, key rotation, operational lifecycle and deployment still require work. See [Persy](../../persy/README.md).
