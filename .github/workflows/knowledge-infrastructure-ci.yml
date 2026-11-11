@@ -68,6 +68,12 @@ jobs:
           psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c "SELECT count(*) FROM specialist_runs"
           python -m specialists.registry
 
+      - name: Verify Coordinator schema and evaluation fixtures
+        working-directory: backend
+        run: |
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c "SELECT count(*) FROM coordinator_runs" -c "SELECT count(*) FROM coordinator_tasks"
+          python -m coordinator.evaluate
+
       - name: Prepare isolated Life Profile database
         working-directory: backend
         run: |

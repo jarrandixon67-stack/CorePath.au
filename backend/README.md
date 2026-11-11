@@ -58,7 +58,7 @@ Repeat application skips recorded files. The runner records filenames, versions 
 
 `--check` is read-only: exit code 0 means up to date, 1 means valid pending migrations and 2 means an error. Applying migrations returns 0 on success and 2 on error. Use `--directory /path/to/release/migrations` when SQL files are stored outside the default checkout layout.
 
-The original six migration files remain unchanged; version 007 extends the release:
+The original six migration files remain unchanged; versions 007–008 extend the release:
 
 | Version | Purpose |
 |---|---|
@@ -69,6 +69,7 @@ The original six migration files remain unchanged; version 007 extends the relea
 | 005 | Executive Administrator role |
 | 006 | Delegated administrator action grants |
 | 007 | Specialist run records, execution leases and English section-search index |
+| 008 | Coordinator runs/tasks, internal Personal AI service role and coordinate grant |
 
 Migrations are explicitly run, not executed during API startup. If an existing database was set up by running SQL directly, the runner refuses to automatically baseline it. Do not drop data or fabricate history to get past that check; use a reviewed adoption plan. Applied files must never be edited. See the [deployment procedure](../docs/knowledge-infrastructure/deployment.md) for release, backup, recovery and existing-database handling.
 
@@ -106,6 +107,10 @@ The [GitHub Actions workflow](../.github/workflows/knowledge-infrastructure-ci.y
 ## Separate specialist runtime
 
 All eleven [specialists](../specialists/README.md) run in `specialists.main:app` on a separate port/process. Their signed Coordinator/specialist capabilities and database service grants do not upgrade this knowledge API's shared-token routes. Use a distinct least-privilege runtime database login. They retrieve only eligible prepared sections and save review-required drafts, with no profile access, member chat or peer execution.
+
+## Coordinator service
+
+The separate [Coordinator](../coordinator/README.md) runs as `coordinator.main:app` on port 8003, with its own signed Personal AI capabilities and restricted database account. It plans research, calls the specialist service through a trusted token-exchange contract and returns traceable draft reports. `python -m coordinator.evaluate` validates synthetic routing fixtures; only an explicitly configured `--live` run calls a model. Neither service upgrades the knowledge API's shared-token routes or provisions human identity.
 
 ## Current limitations
 
