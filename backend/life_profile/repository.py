@@ -93,7 +93,14 @@ class ProfileRepository:
             return {"consent": consent, "consent_revision": row["consent_revision"], "items": items}
 
     def propose(
-        self, subject: str, payloads: list[dict], consent_revision: int, request_id: str
+        self,
+        subject: str,
+        payloads: list[dict],
+        consent_revision: int,
+        request_id: str,
+        *,
+        journal_source=None,
+        journal_sources=None,
     ) -> list[dict]:
         with self.pool.connection() as conn:
             row, consent = self._profile(conn, subject, lock=True)
@@ -101,6 +108,36 @@ class ProfileRepository:
                 raise ProfileConflict("Consent changed while the analysis was running.")
             if not consent.analysis_enabled or not consent.external_model_processing:
                 raise ConsentRequired
+            sources = journal_sources or {}
+            for source_id, source_version in sources.items():
+                source = (
+                    conn.cursor(row_factory=dict_row)
+                    .execute(
+                        """SELECT version, include_in_profile FROM life_profile_journal_entries
+                       WHERE subject=%s AND id=%s FOR UPDATE""",
+                        (subject, UUID(source_id)),
+                    )
+                    .fetchone()
+                )
+                if source is None or not source["include_in_profile"]:
+                    raise ConsentRequired
+                if source["version"] != source_version:
+                    raise ProfileConflict("Journal context changed during analysis.")
+            if journal_source is not None:
+                entry_id, entry_version = journal_source
+                entry = (
+                    conn.cursor(row_factory=dict_row)
+                    .execute(
+                        """SELECT * FROM life_profile_journal_entries
+                       WHERE subject=%s AND id=%s FOR UPDATE""",
+                        (subject, entry_id),
+                    )
+                    .fetchone()
+                )
+                if entry is None or not entry["include_in_profile"]:
+                    raise ConsentRequired
+                if entry["version"] != entry_version or entry["analysed_version"] == entry_version:
+                    raise ProfileConflict("The journal source changed or was already processed.")
             results = []
             for payload in payloads:
                 if payload["category"] not in consent.categories:
@@ -115,6 +152,18 @@ class ProfileRepository:
                 self.audit(conn, subject, "observation.propose", request_id, item[0])
                 results.append(
                     {"id": str(item[0]), "version": item[1], "state": "pending", **payload}
+                )
+                for source_id, source_version in sources.items():
+                    conn.execute(
+                        """INSERT INTO life_profile_journal_observations
+                           (subject, entry_id, item_id, entry_version) VALUES (%s, %s, %s, %s)""",
+                        (subject, UUID(source_id), item[0], source_version),
+                    )
+            if journal_source is not None:
+                conn.execute(
+                    """UPDATE life_profile_journal_entries SET analysed_version=%s,
+                       analysis_state='processed' WHERE subject=%s AND id=%s""",
+                    (journal_source[1], subject, journal_source[0]),
                 )
             return results
 
