@@ -2,6 +2,8 @@
 
 | Document | Purpose |
 |---|---|
+| [Feedback Bot](../feedback/README.md) | Private feedback, permitted review analysis and human concern review; separate permissions and consent |
+| [Australian health partner standard](partners/AU-HEALTH-STANDARD.md) | Five approved baseline requirements and proposed health-specific requirements; no live campaign |
 | [Persy Personal AI](../persy/README.md) | Member conversation, optional memory, profile controls and reviewed research |
 | [Coordinator bot](../coordinator/README.md) | Planning, controlled collaboration, cited synthesis, service identity and evaluation |
 | [Eleven specialist bots](../specialists/README.md) | Roles, bounded research, gateway capabilities, permissions and remaining integration |

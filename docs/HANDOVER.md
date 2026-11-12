@@ -81,3 +81,14 @@ The Coordinator was merged as `951d89a09e7b143733fb6861c00e0742ab88a9b3`; its [P
 ## Resume checklist
 
 Read [implementation status](knowledge-infrastructure/implementation-status.md), [architecture](knowledge-infrastructure/architecture.md), [technical decisions](knowledge-infrastructure/decisions.md) and the latest PR/CI results. Confirm the current branch and base commit before editing; do not overwrite another contributor's work. Keep implemented code, passing tests and deployed infrastructure distinct in every update.
+
+
+## Partner qualification, feedback and future research
+
+The founder selected Australia and health/wellbeing for the first partner trial and approved five baseline requirements: identity/licensing, clear pricing/terms, credible quality evidence, a working complaints process and safety/regulatory standing. Four additional health checks remain proposed. See the [health standard](partners/AU-HEALTH-STANDARD.md) and [partner bot](../partners/README.md).
+
+Natural or under-researched approaches must not be rejected solely for that reason. Assess the actual practice, claim, competence, uncertainty and risk. The approved direction includes a future independent research programme when resources permit; feedback is a source of research questions rather than clinical proof. No research funding, study or outcome is guaranteed.
+
+The separate [Feedback Bot](../feedback/README.md) covers positive and negative feedback about both CorePath and partner businesses, permitted review analysis and human concern review. It has no authority to change ratings, qualify businesses, send recruitment mail or access Life Profiles. Private AI analysis is opt-in; source withdrawal retracts derived signals. Concerns remain unverified until a person investigates.
+
+These new services are code implementations with synthetic tests, not deployed services or an active worldwide campaign. No real business was rated or emailed. Live use requires the separate service/database/gateway setup, verified sender/recipient eligibility and an actual approved country/sector policy. The journalling introduction is published separately in the existing Forest & ivory Sites project.

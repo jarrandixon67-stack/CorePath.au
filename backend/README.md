@@ -119,3 +119,9 @@ The separate [Persy service](../persy/README.md) runs as `persy.main:app` on por
 ## Current limitations
 
 The knowledge API does not yet implement source ingestion, production identity and sessions, human endpoint-level role authorisation or production deployment. The separate specialist service provides initial scoped retrieval and draft execution; live model quality remains unverified. The [frontend](../frontend/README.md) remains a separate demonstration. See [implementation status](../docs/knowledge-infrastructure/implementation-status.md) for verified evidence and remaining work.
+
+## Business partner bot
+
+The isolated `partners.main:app` service and `python -m partners.worker` implement evidence-based qualification and controlled invitations. The [service guide](../partners/README.md) records the Australian health trial, its pending sector-standard review, action capabilities, restricted database roles and disabled email configuration. It has no access to Life Profile or Persy databases.
+
+The separate `feedback.main:app` service implements private feedback prompts, consented theme analysis and human concern review. See the [Feedback Bot guide](../feedback/README.md) for its isolated database, encryption, consent and role boundaries.

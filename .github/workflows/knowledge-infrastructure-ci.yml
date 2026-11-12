@@ -33,6 +33,8 @@ jobs:
     env:
       DATABASE_URL: postgresql://corepath:corepath-test@localhost:5432/corepath_test
       LIFE_PROFILE_DATABASE_URL: postgresql://corepath:corepath-test@localhost:5432/corepath_profiles_test
+      FEEDBACK_TEST_DATABASE_URL: postgresql://corepath:corepath-test@localhost:5432/corepath_feedback_test
+      PARTNERS_TEST_DATABASE_URL: postgresql://corepath:corepath-test@localhost:5432/corepath_partners_test
       PERSY_DATABASE_URL: postgresql://corepath:corepath-test@localhost:5432/corepath_persy_test
 
     steps:
@@ -90,6 +92,22 @@ jobs:
           DATABASE_URL="$PERSY_DATABASE_URL" python -m app.migrations --directory ../persy/database/migrations
           DATABASE_URL="$PERSY_DATABASE_URL" python -m app.migrations --directory ../persy/database/migrations
           DATABASE_URL="$PERSY_DATABASE_URL" python -m app.migrations --directory ../persy/database/migrations --check
+
+      - name: Prepare isolated partner database
+        working-directory: backend
+        run: |
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c "CREATE DATABASE corepath_partners_test"
+          DATABASE_URL="$PARTNERS_TEST_DATABASE_URL" python -m app.migrations --directory ../partners/database/migrations
+          DATABASE_URL="$PARTNERS_TEST_DATABASE_URL" python -m app.migrations --directory ../partners/database/migrations
+          DATABASE_URL="$PARTNERS_TEST_DATABASE_URL" python -m app.migrations --directory ../partners/database/migrations --check
+
+      - name: Prepare isolated feedback database
+        working-directory: backend
+        run: |
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c "CREATE DATABASE corepath_feedback_test"
+          DATABASE_URL="$FEEDBACK_TEST_DATABASE_URL" python -m app.migrations --directory ../feedback/database/migrations
+          DATABASE_URL="$FEEDBACK_TEST_DATABASE_URL" python -m app.migrations --directory ../feedback/database/migrations
+          DATABASE_URL="$FEEDBACK_TEST_DATABASE_URL" python -m app.migrations --directory ../feedback/database/migrations --check
 
       - name: Run backend tests
         working-directory: backend

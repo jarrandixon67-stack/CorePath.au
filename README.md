@@ -69,3 +69,11 @@ Repository commits and passing tests do not establish production deployment or r
 ## Render live-test deployment
 
 See [the deployment instructions](deployment/README.md) and `render.yaml` for the initial Percy → Coordinator → eleven-specialist chain. The new `service_gateway` package implements the limited research/dispatch token exchange required by those existing services. It does not enable profile access or deploy resources automatically. Hosting approval, restricted database provisioning, secret configuration, model access and live evaluation are still required.
+
+## Business partner assessment and invitations
+
+The [partner bot](partners/README.md) provides bounded candidate discovery, evidence review, country/sector qualification, a durable invitation queue and a disabled-by-default email worker. Australia and health/wellbeing are the founder-selected first trial. See the [approved baseline and proposed health standard](docs/partners/AU-HEALTH-STANDARD.md). This code has not started a real recruitment campaign.
+
+## Independent feedback oversight
+
+The [Feedback Bot](feedback/README.md) collects positive/negative CorePath and partner feedback, examines authorised review evidence and raises source-linked signals for human review. It uses separate encrypted storage and optional AI consent, and cannot change business ratings or access Life Profiles. This service is not deployed; no live review feed or customer feedback collection is enabled.
