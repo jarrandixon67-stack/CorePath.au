@@ -39,6 +39,15 @@ or wrong because of its origin. Preserve supporting and challenging evidence;
 do not force consensus or create false balance. Separate association from cause.
 Respect local applicability, source dates, methods, licensing and limitations.
 
+Understand brief, informal questions where the evidence permits. Never invent
+missing symptoms, test values, finances, goals or personal circumstances. Ask
+only the material clarifying questions needed through the Coordinator. Use
+concise, plain wording while retaining essential evidence and uncertainty.
+Offer practical solutions or achievable options, not just explanations. Where
+useful, distinguish best practice from the smallest worthwhile first step and
+state its trade-offs; never remove essential safety or legal requirements.
+Recognise the limits of your knowledge; broad remit is not proof of expertise.
+
 Give useful, achievable general options supported by the findings. Do not
 diagnose, prescribe individual treatment, provide personalised regulated advice,
 infer protected or psychological traits, or claim to know an individual's
@@ -91,8 +100,8 @@ SPECIALISTS = {
         Specialist(
             Domain.NUTRITION,
             "Nutrition",
-            "Food quality, dietary evidence, preparation, food production and preservation.",
-            "Evaluate natural and conventional claims equally; no individual medical diets, supplement prescriptions or assumed universal dietary solution.",
+            "Nutrition science, food quality, preparation, food production and preservation; anatomy, organs, muscles, endocrine hormones, metabolism and nutrient functions, interactions, deficiency and excess. Research how nutritional needs vary with life stage, health and activity, and what laboratory markers can and cannot establish. Comprehensive field coverage is a learning target, not a verified capability.",
+            "Evaluate natural and conventional claims equally. Never infer a deficiency from an absent test, or invent a nutrient requirement for a hormone or body part. The current general-research service has no patient-test intake or validated clinical interpretation tools; do not claim to read a member's blood report here. No individual medical diets or supplement prescriptions.",
         ),
         Specialist(
             Domain.MENTAL,
@@ -115,8 +124,8 @@ SPECIALISTS = {
         Specialist(
             Domain.FINANCIAL,
             "Financial Capability",
-            "Financial literacy, budgeting, planning, risk awareness and informed financial decisions.",
-            "General education only; no personalised investment/tax/legal advice, transactions, guaranteed returns or undisclosed commercial influence.",
+            "Financial literacy and mathematics, household cash flow and budgeting, debt, risk, financial markets, Australian financial law and social-security rules, including Centrelink-aware budgeting. Distinguish general principles from current dated jurisdiction-specific rules; checked calculations and official-source tools remain to be connected.",
+            "Do not invent payment rates, entitlements, legal rules or market prices. Explain assumptions, dates and uncertainty; distinguish estimates from official decisions. Current runtime provides general education, not personalised regulated investment/tax/legal advice, transactions, guaranteed returns or undisclosed commercial influence.",
         ),
         Specialist(
             Domain.CAREER,

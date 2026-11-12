@@ -15,13 +15,48 @@ from test_specialists_runtime import excerpt, proposal_for
 from coordinator.evaluate import load_cases
 from coordinator.evaluate import main as evaluate
 from coordinator.main import app, repository, runtime
-from coordinator.models import Plan
+from coordinator.models import Plan, ResearchRequest
 from coordinator.provider import OpenAIProvider
+from coordinator.runtime import validate_assignments
 from coordinator.settings import Settings, get_settings
 from coordinator.transport import HTTPSpecialistClient
+from persy.models import ResearchProposal
+from persy.services import render_research
 from specialists.models import BudgetExceeded, InvalidEvidence, ProviderUnavailable
 from specialists.registry import Domain
 from specialists.runtime import grounded_result
+
+
+def test_tenth_specialist_is_rejected_by_request_configuration_and_persy_boundaries():
+    payload = {
+        "question": "Research the relevant evidence",
+        "allowed_domains": list(Domain),
+        "max_specialist_calls": 9,
+        "allow_collaboration": True,
+    }
+    assert len(ResearchRequest.model_validate(payload).allowed_domains) == 11
+    assert ResearchProposal.model_validate(payload).max_specialist_calls == 9
+    payload["max_specialist_calls"] = 10
+    for contract in (ResearchRequest, ResearchProposal):
+        with pytest.raises(ValidationError):
+            contract.model_validate(payload)
+    with pytest.raises(ValidationError):
+        Settings(max_specialist_calls=10)
+    with pytest.raises(InvalidEvidence, match="task count"):
+        render_research(
+            {
+                "audience": "personal_ai_internal",
+                "review_required": True,
+                "life_profile_access": False,
+                "state": "completed",
+                "tasks": [{}] * 10,
+            }
+        )
+
+
+def test_followup_cannot_expand_an_existing_nine_specialist_team():
+    with pytest.raises(InvalidEvidence):
+        validate_assignments([assignment(list(Domain)[9])], list(Domain), 2, used=list(Domain)[:9])
 
 
 def keys():

@@ -6,6 +6,7 @@ import httpx
 from fastapi import HTTPException
 from pydantic import Field, ValidationError
 
+from coordinator.limits import MAX_SPECIALIST_CALLS
 from coordinator.models import SpecialistResult
 from life_profile.models import Category, Dimension
 from persy.models import Missing, PrivacyRequired
@@ -65,7 +66,7 @@ def render_research(payload):
     ):
         raise InvalidEvidence("Invalid Coordinator envelope")
     tasks = payload.get("tasks", [])
-    if not isinstance(tasks, list) or len(tasks) > 11:
+    if not isinstance(tasks, list) or len(tasks) > MAX_SPECIALIST_CALLS:
         raise InvalidEvidence("Invalid Coordinator task count")
     tasks = [TaskEnvelope.model_validate(task) for task in tasks]
     if len({task.task_id for task in tasks}) != len(tasks) or len(

@@ -3,6 +3,7 @@ from uuid import UUID
 
 from pydantic import Field, model_validator
 
+from coordinator.limits import MAX_SPECIALIST_CALLS
 from specialists.models import Collaboration, Contradiction, Option, ShortText, StrictModel, Task
 from specialists.registry import Domain
 
@@ -10,7 +11,7 @@ from specialists.registry import Domain
 class ResearchRequest(StrictModel):
     question: str = Field(min_length=5, max_length=2000)
     allowed_domains: list[Domain] = Field(min_length=1, max_length=11)
-    max_specialist_calls: int = Field(default=4, ge=1, le=11)
+    max_specialist_calls: int = Field(default=4, ge=1, le=MAX_SPECIALIST_CALLS)
     allow_collaboration: bool = False
 
     @model_validator(mode="after")
@@ -34,7 +35,7 @@ class Plan(StrictModel):
     decision: Literal["research", "clarify"]
     rationale: ShortText
     questions: list[ShortText] = Field(max_length=3)
-    assignments: list[Assignment] = Field(max_length=11)
+    assignments: list[Assignment] = Field(max_length=MAX_SPECIALIST_CALLS)
 
     @model_validator(mode="after")
     def coherent_decision(self):
@@ -47,7 +48,7 @@ class Plan(StrictModel):
 
 class CollaborationPlan(StrictModel):
     rationale: ShortText
-    assignments: list[Assignment] = Field(max_length=11)
+    assignments: list[Assignment] = Field(max_length=MAX_SPECIALIST_CALLS)
 
 
 class SourceCitation(StrictModel):
