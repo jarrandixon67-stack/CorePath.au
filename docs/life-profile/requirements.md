@@ -41,7 +41,7 @@ Explicit user statements are still proposals awaiting review; model confidence i
 - A separate Life Profiling process owns the profile database connection and encryption key. The knowledge application has no profile routes or tables.
 - Short-lived Ed25519-signed capabilities identify the individual, Personal AI caller, purpose and action. The service holds a public verification key only. Trusted gateway authentication and owner authorisation must precede issuing capabilities.
 - Human governance roles, Coordinator and specialists cannot call profile endpoints directly. The Personal AI can mediate an individual's review/control requests and receive explicitly approved context; it does not receive direct database access.
-- Private journals, assistant messages and unapproved interaction metadata are not accepted sources. Response time, typing patterns and similar metadata are excluded from this first version.
+- Journal integration was explicitly authorised by the founder on 12 November 2026: entries are eligible for the private Life Profile by default, clearly disclosed, with per-entry exclusion and a customer-controlled default for new entries. This replaces the first implementation's blanket journal exclusion. Excluded entries, assistant messages and unapproved interaction metadata remain disallowed sources. Response time and typing patterns remain excluded.
 - Consent, statements, evidence and correction history are encrypted with a deployment-supplied Fernet key. Audit rows contain operation metadata, not profile text.
 - Health, relationship, cultural and career/financial observations are treated as sensitive regardless of a model's label. Corrections are conservatively treated as sensitive. Sensitive sharing needs the corresponding consent.
 - A missing model connection returns unavailable; there is no invented substitute inference. Only synthetic data and mocked model responses are used in automated tests.
@@ -57,3 +57,13 @@ Explicit user statements are still proposals awaiting review; model confidence i
 - Add the user-facing profile review experience and evaluate whether understanding improves useful outcomes.
 
 Personal plans, wellbeing exercises, Trigger & Behaviour Quadrant (RECOGNISE → GROUND → CHOOSE), A Clear Path to Conversation and other practical interventions remain later capabilities. This service does not prescribe activities, diagnose a person or conduct user-facing conversations itself.
+
+## Journal contract
+
+Journal text, titles and entry dates are encrypted in the separate Life Profile database. The same owner-scoped Personal AI capability boundary mediates journal controls; administrators, Founder, Coordinator and specialists do not gain access. The default inclusion flag is source eligibility, not external-model consent, accepted understanding or permission to share with Percy. Existing category, purpose, external-processing and sensitive-observation consent still applies. A new journal owner starts with those processing permissions disabled.
+
+Only the journal service loads a persisted included entry into `journal_entry` source messages. The ordinary analysis endpoint rejects caller-supplied journal sources. Before committing proposals, the repository rechecks the entry version, inclusion and consent revision. Journal source provenance propagates through accepted context, so excluding, changing or deleting an entry also retracts active downstream observations and their encrypted version history. An exclusion during model work prevents stale proposals. Previously transmitted provider input and backups cannot be recalled by this active-database operation.
+
+Create requests use an owner-scoped unique client reference for retry safety. Edit/delete and preference changes require current versions. No-op edits preserve accepted observations. Defaults apply to future entries only; existing choices are not silently rewritten. Pagination never accepts another individual's cursor. Audit events contain operations and opaque identifiers, never journal text.
+
+This feature has code and automated coverage, not a configured production deployment. It still needs migration 002, the isolated service/database, managed encryption and gateway keys, an owner binding, consent/review integration and operational checks before real-user saving or profiling is enabled. The website must show disconnected storage honestly and must not substitute plaintext browser storage or a fabricated saved state.

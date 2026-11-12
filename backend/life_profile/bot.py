@@ -65,7 +65,19 @@ class LifeProfileBot:
     def __init__(self, repository: ProfileRepository, provider: Provider):
         self.repository, self.provider = repository, provider
 
-    def analyse(self, subject: str, request: AnalyseRequest, request_id: str) -> dict:
+    def analyse(
+        self, subject: str, request: AnalyseRequest, request_id: str, *, journal_source=None
+    ) -> dict:
+        journal_messages = [m for m in request.messages if m.source_type == "journal_entry"]
+        if journal_messages:
+            if (
+                journal_source is None
+                or len(request.messages) != 1
+                or journal_messages[0].message_id != "journal:" + str(journal_source[0])
+            ):
+                raise ConsentRequired
+        elif journal_source is not None:
+            raise ConsentRequired
         snapshot = self.repository.snapshot(subject, request_id)
         consent = snapshot["consent"]
         if not consent.analysis_enabled or not consent.external_model_processing:
@@ -93,9 +105,32 @@ class LifeProfileBot:
             }
         )
         payloads = validate_proposal(proposal, request, consent)
-        results = self.repository.propose(
-            subject, payloads, snapshot["consent_revision"], request_id
-        )
+        journal_sources = {}
+        for item in snapshot["items"]:
+            if (
+                item["state"] == "accepted"
+                and item["category"] in consent.categories
+                and (not item["sensitive"] or consent.sensitive_observations_enabled)
+            ):
+                journal_sources.update(item.get("journal_sources", {}))
+        if journal_source is not None:
+            journal_sources[str(journal_source[0])] = journal_source[1]
+        for payload in payloads:
+            if journal_sources:
+                payload["journal_sources"] = journal_sources
+        if not journal_sources:
+            results = self.repository.propose(
+                subject, payloads, snapshot["consent_revision"], request_id
+            )
+        else:
+            results = self.repository.propose(
+                subject,
+                payloads,
+                snapshot["consent_revision"],
+                request_id,
+                journal_source=journal_source,
+                journal_sources=journal_sources,
+            )
         follow_up = proposal.follow_up
         if (
             follow_up
