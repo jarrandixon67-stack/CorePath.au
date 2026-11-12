@@ -51,7 +51,7 @@ class Consent(StrictModel):
 class SourceMessage(StrictModel):
     message_id: str = Field(min_length=1, max_length=100)
     conversation_id: str = Field(min_length=1, max_length=100)
-    source_type: Literal["conversation", "reflection", "user_update"]
+    source_type: Literal["conversation", "reflection", "user_update", "journal_entry"]
     speaker: Literal["user"]
     content: str = Field(min_length=1, max_length=4000)
     observed_at: AwareDatetime | None = None
