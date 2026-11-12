@@ -163,6 +163,13 @@ class JournalStore:
     def create(self, subject, data: EntryCreate, request_id):
         with self.profiles.pool.connection() as conn:
             self._owner(conn, subject)
+            deleted = conn.execute(
+                """SELECT 1 FROM life_profile_journal_deleted_references
+                   WHERE subject=%s AND client_reference=%s""",
+                (subject, data.client_reference),
+            ).fetchone()
+            if deleted:
+                raise ProfileConflict("This entry was deleted. Start a new entry to write again.")
             old = (
                 conn.cursor(row_factory=dict_row)
                 .execute(
@@ -256,6 +263,11 @@ class JournalStore:
             if row["version"] != expected_version:
                 raise ProfileConflict("This entry changed. Reload before deleting.")
             self._retract(conn, subject, entry_id, request_id)
+            conn.execute(
+                """INSERT INTO life_profile_journal_deleted_references(subject, client_reference)
+                   VALUES (%s, %s) ON CONFLICT DO NOTHING""",
+                (subject, row["client_reference"]),
+            )
             conn.execute(
                 "DELETE FROM life_profile_journal_entries WHERE subject=%s AND id=%s",
                 (subject, entry_id),
