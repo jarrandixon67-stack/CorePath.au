@@ -3,11 +3,19 @@ from uuid import UUID
 
 from cryptography.fernet import InvalidToken
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from psycopg import Error as DatabaseError
 from psycopg_pool import ConnectionPool, PoolTimeout
 
 from life_profile.bot import LifeProfileBot
+from life_profile.journal import (
+    EntryCreate,
+    EntryUpdate,
+    JournalService,
+    JournalSettings,
+    JournalStore,
+)
 from life_profile.models import AnalyseRequest, Consent, Decision
 from life_profile.provider import InvalidProposal, OpenAIProvider, ProviderUnavailable
 from life_profile.repository import (
@@ -84,6 +92,12 @@ def bot(repo: ProfileRepository = Depends(repository)) -> LifeProfileBot:  # noq
 @app.exception_handler(ProfileMissing)
 async def missing(_request, _exc):
     return JSONResponse({"detail": "Profile or observation not found for this individual"}, 404)
+
+
+@app.exception_handler(RequestValidationError)
+async def invalid_input(_request, _exc):
+    # Do not reflect journal text or other private request payloads in errors.
+    return JSONResponse({"detail": "Check the submitted fields and required values"}, 422)
 
 
 @app.exception_handler(ProfileConflict)
@@ -182,4 +196,92 @@ def delete_profile(
     repo: ProfileRepository = Depends(repository),  # noqa: B008
 ):
     repo.delete_profile(caller.subject)
+    return Response(status_code=204)
+
+
+@app.get("/v1/life-profile/journal/settings")
+def journal_settings(
+    caller: Caller = Depends(require_capability("profile:journal_read", "owner_review")),  # noqa: B008
+    repo: ProfileRepository = Depends(repository),  # noqa: B008
+):
+    return JournalStore(repo).settings(caller.subject)
+
+
+@app.put("/v1/life-profile/journal/settings")
+def update_journal_settings(
+    value: JournalSettings,
+    caller: Caller = Depends(require_capability("profile:journal_write", "owner_control")),  # noqa: B008
+    repo: ProfileRepository = Depends(repository),  # noqa: B008
+):
+    return JournalStore(repo).set_settings(caller.subject, value, caller.request_id)
+
+
+@app.get("/v1/life-profile/journal/entries")
+def journal_entries(
+    before: UUID | None = None,
+    caller: Caller = Depends(require_capability("profile:journal_read", "owner_review")),  # noqa: B008
+    repo: ProfileRepository = Depends(repository),  # noqa: B008
+):
+    return JournalStore(repo).list(caller.subject, caller.request_id, before)
+
+
+@app.get("/v1/life-profile/journal/entries/{entry_id}")
+def journal_entry(
+    entry_id: UUID,
+    caller: Caller = Depends(require_capability("profile:journal_read", "owner_review")),  # noqa: B008
+    repo: ProfileRepository = Depends(repository),  # noqa: B008
+):
+    return JournalStore(repo).get(caller.subject, entry_id, caller.request_id)
+
+
+@app.post("/v1/life-profile/journal/entries")
+def create_journal_entry(
+    value: EntryCreate,
+    caller: Caller = Depends(require_capability("profile:journal_write", "owner_control")),  # noqa: B008
+    repo: ProfileRepository = Depends(repository),  # noqa: B008
+    service: LifeProfileBot = Depends(bot),  # noqa: B008
+):
+    store = JournalStore(repo)
+    entry, created = store.create(caller.subject, value, caller.request_id)
+    result = JournalService(store, service).analyse(
+        caller.subject, UUID(entry["id"]), caller.request_id
+    )
+    return {**result, "created": created}
+
+
+@app.put("/v1/life-profile/journal/entries/{entry_id}")
+def update_journal_entry(
+    entry_id: UUID,
+    value: EntryUpdate,
+    caller: Caller = Depends(require_capability("profile:journal_write", "owner_control")),  # noqa: B008
+    repo: ProfileRepository = Depends(repository),  # noqa: B008
+    service: LifeProfileBot = Depends(bot),  # noqa: B008
+):
+    store = JournalStore(repo)
+    store.update(caller.subject, entry_id, value, caller.request_id)
+    return JournalService(store, service).analyse(caller.subject, entry_id, caller.request_id)
+
+
+@app.post("/v1/life-profile/journal/entries/{entry_id}/analyse")
+def analyse_journal_entry(
+    entry_id: UUID,
+    caller: Caller = Depends(require_capability("profile:journal_analyse", "profile_analysis")),  # noqa: B008
+    repo: ProfileRepository = Depends(repository),  # noqa: B008
+    service: LifeProfileBot = Depends(bot),  # noqa: B008
+):
+    return JournalService(JournalStore(repo), service).analyse(
+        caller.subject, entry_id, caller.request_id
+    )
+
+
+@app.delete("/v1/life-profile/journal/entries/{entry_id}", status_code=204)
+def delete_journal_entry(
+    entry_id: UUID,
+    expected_version: int,
+    caller: Caller = Depends(require_capability("profile:journal_delete", "owner_control")),  # noqa: B008
+    repo: ProfileRepository = Depends(repository),  # noqa: B008
+):
+    if expected_version < 1:
+        raise HTTPException(422, "A positive current entry version is required")
+    JournalStore(repo).delete(caller.subject, entry_id, expected_version, caller.request_id)
     return Response(status_code=204)
