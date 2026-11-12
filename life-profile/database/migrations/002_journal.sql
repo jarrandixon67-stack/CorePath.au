@@ -22,6 +22,13 @@ CREATE TABLE life_profile_journal_entries (
 );
 CREATE INDEX journal_entries_owner_order
     ON life_profile_journal_entries(subject, created_at DESC, id DESC);
+-- Keep payload-free retry tombstones so delayed creates cannot restore deleted entries.
+CREATE TABLE life_profile_journal_deleted_references (
+    subject TEXT NOT NULL REFERENCES life_profiles(subject) ON DELETE CASCADE,
+    client_reference UUID NOT NULL,
+    deleted_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY(subject, client_reference)
+);
 ALTER TABLE life_profile_items ADD CONSTRAINT life_profile_items_owner_id UNIQUE(subject, id);
 CREATE TABLE life_profile_journal_observations (
     subject TEXT NOT NULL,
