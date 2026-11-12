@@ -122,6 +122,17 @@ def test_global_default_is_for_future_entries_and_explicit_exclusion_wins(profil
     assert model.calls == 0
 
 
+def test_a_delayed_create_retry_cannot_restore_a_deleted_entry(profiles):
+    repo, _, owner, _, _ = profiles
+    store = JournalStore(repo)
+    data = entry()
+    saved, _ = store.create(owner, data, "save")
+    store.delete(owner, UUID(saved["id"]), 1, "delete")
+    with pytest.raises(ProfileConflict):
+        store.create(owner, data, "late-retry")
+    assert store.list(owner, "review")["entries"] == []
+
+
 def test_included_current_entry_produces_pending_reviewable_observations(profiles):
     repo, _, owner, _, _ = profiles
     store = JournalStore(repo)
