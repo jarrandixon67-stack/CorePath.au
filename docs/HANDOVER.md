@@ -17,6 +17,29 @@ The immediate build is the shared knowledge foundation for eleven specialist dom
 
 ## Current continuation
 
+The founder expanded the specialist requirements: understand brief descriptions,
+give concise practical solutions, collaborate in teams of at most ten bots
+including the Coordinator, and distinguish best practice from a minimum useful
+action when appropriate. [The capability specification](SPECIALIST-CAPABILITIES.md)
+records Nutrition's anatomy/hormone/nutrient and blood-result targets, Finance's
+mathematics/Australian-law/markets/Centrelink targets, proposed tools, independent
+evaluation requirements and the approved future subscriber-referral flow.
+The first implementation expands the two discipline briefs, enforces a nine-
+specialist ceiling at server dispatch and Persy boundaries, and adds an explicit
+operator tool-needs consultation command. Reports never grant tools or certify
+expertise. Clinical intake, validated blood interpretation, financial calculators,
+current official rules and subscriber-to-partner matching remain unimplemented.
+Do not describe prepared consultation briefs as replies from live bots.
+
+The founder then approved applying this standard across all bots. The
+[shared implementation](BOT-STANDARD.md) is included in the actual model
+instructions of all eleven specialists, Coordinator, Persy, Life Profiling AI,
+partner research and feedback analysis. Each specialist now has a detailed
+discipline remit, proposed tool requirements and an evaluation focus. The
+catalogue and tool-consultation reports identify the standard version/hash and
+continue to mark expertise unverified. This updates instructions and planning
+metadata; it does not add trained expertise, grant tools or deploy services.
+
 The founder first prioritised the **Life Profiling bot**, supplying `Life Profile.docx` as requirements input. The first [profile service](../life-profile/README.md) and [source-document requirements review](life-profile/requirements.md) now define that continuation. It is a separate service/database, with signed Personal AI capabilities, encrypted profile data, consented model analysis, owner review/correction and controlled sharing. This changes the immediate bot build order; it does not discard the remaining eleven-specialist architecture.
 
 The model, trusted identity gateway and profile deployment are not configured by this code. The hosted Founder portal remains a separate private workspace, without a live profile conversation interface. Confirm the Life Profile continuation commit's actual CI results before claiming its tests pass.

@@ -4,6 +4,8 @@ from urllib.parse import urlsplit
 from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from coordinator.limits import MAX_SPECIALIST_CALLS
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="COORDINATOR_", env_file=".env", extra="ignore")
@@ -24,7 +26,7 @@ class Settings(BaseSettings):
     model_timeout_seconds: float = Field(default=30, ge=1, le=60)
     specialist_timeout_seconds: float = Field(default=45, ge=1, le=90)
     max_context_chars: int = Field(default=80000, ge=4000, le=200000)
-    max_specialist_calls: int = Field(default=4, ge=1, le=11)
+    max_specialist_calls: int = Field(default=MAX_SPECIALIST_CALLS, ge=1, le=MAX_SPECIALIST_CALLS)
     max_runs_per_24h: int = Field(default=20, ge=1, le=1000)
     max_concurrent_runs: int = Field(default=1, ge=1, le=10)
     max_duration_seconds: int = Field(default=180, ge=30, le=240)

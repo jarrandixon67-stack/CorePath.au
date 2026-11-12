@@ -3,6 +3,7 @@ from uuid import UUID
 
 from pydantic import Field
 
+from coordinator.limits import MAX_SPECIALIST_CALLS
 from coordinator.models import ResearchRequest
 from specialists.models import ShortText, StrictModel
 
@@ -24,7 +25,7 @@ class Message(StrictModel):
 
 
 class ResearchProposal(ResearchRequest):
-    max_specialist_calls: int = Field(ge=1, le=4)
+    max_specialist_calls: int = Field(ge=1, le=MAX_SPECIALIST_CALLS)
     allow_collaboration: bool
 
 

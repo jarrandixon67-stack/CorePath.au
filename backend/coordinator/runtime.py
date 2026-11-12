@@ -1,5 +1,6 @@
 from pydantic import ValidationError
 
+from coordinator.limits import MAX_SPECIALIST_CALLS, MAX_TEAM_BOTS
 from coordinator.models import ResearchRequest, SpecialistResult, Synthesis
 from coordinator.provider import Provider
 from coordinator.repository import Repository
@@ -20,7 +21,7 @@ CONFIDENCE = {"low": 0, "moderate": 1, "high": 2}
 def validate_assignments(assignments, allowed, remaining, used=()):
     domains = [assignment.domain for assignment in assignments]
     if (
-        len(domains) > remaining
+        len(domains) > min(remaining, MAX_SPECIALIST_CALLS - len(set(used)))
         or len(set(domains)) != len(domains)
         or set(domains) & set(used)
         or not set(domains) <= set(allowed)
@@ -158,6 +159,8 @@ class Runtime:
                 "clarifying_questions": plan.questions,
                 "allowed_domains": [domain.value for domain in request.allowed_domains],
                 "call_budget": row["max_calls"],
+                "team_bot_limit": MAX_TEAM_BOTS,
+                "team_count_includes": "coordinator_and_dispatched_specialists",
                 "confidence_note": "Uncalibrated model judgement; citations establish traceability, not truth or entailment.",
             }
             if plan.decision == "clarify":

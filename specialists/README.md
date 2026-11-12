@@ -2,6 +2,14 @@
 
 The first runtime for all eleven established specialist domains. These are distinct instructions, library scopes and testable execution paths using a shared model adapter. They are not eleven newly trained models. A default model can serve them all, with optional per-specialist overrides.
 
+The [expanded capability requirements](../docs/SPECIALIST-CAPABILITIES.md) define
+Nutrition's physiology/nutrient/lab-interpretation target, Financial Capability's
+Australian maths/law/markets/Centrelink target, concise practical guidance and
+independent evaluation. These are development targets, not verified expertise.
+`python -m specialists.tool_needs` prepares tool-consultation briefs without model
+calls. Explicit `--live` consultations require configured models, credentials and
+a new `--output` report; responses are proposed requirements, never permissions.
+
 | Specialist | Domain slug |
 |---|---|
 | Personal Development | `personal-development` |

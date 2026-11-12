@@ -492,6 +492,11 @@ def test_model_request_uses_only_authorised_feedback_and_strict_citations(feedba
 
     def handler(request):
         requests.append(json.loads(request.content))
+        from bot_standards import STANDARD
+
+        assert STANDARD in requests[-1]["input"][0]["content"]
+        assert "Do not send messages or decide sanctions" in requests[-1]["input"][0]["content"]
+        assert "tools" not in requests[-1]
         draft = analysis(snapshot).model_dump_json()
         return httpx.Response(
             200, json={"output": [{"content": [{"type": "output_text", "text": draft}]}]}

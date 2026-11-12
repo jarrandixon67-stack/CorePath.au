@@ -58,6 +58,23 @@ class Proposal(StrictModel):
     collaboration_requests: list[Collaboration] = Field(max_length=3)
 
 
+class ToolNeed(StrictModel):
+    name: str = Field(min_length=3, max_length=100)
+    priority: Literal["minimum_required", "next", "later"]
+    purpose: ShortText
+    required_data: list[ShortText] = Field(max_length=6)
+    privacy_requirements: ShortText
+    source_requirements: ShortText
+    validation_before_use: ShortText
+    alternative_without_tool: ShortText
+
+
+class ToolNeeds(StrictModel):
+    requests: list[ToolNeed] = Field(max_length=6)
+    knowledge_gaps: list[ShortText] = Field(max_length=5)
+    evaluation_needs: list[ShortText] = Field(min_length=1, max_length=5)
+
+
 @dataclass(frozen=True)
 class Capability:
     subject: str

@@ -5,6 +5,7 @@ from uuid import UUID, uuid4
 from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
+from coordinator.limits import MAX_SPECIALIST_CALLS
 from coordinator.models import Assignment, ResearchRequest, SpecialistResult
 from coordinator.policy import POLICY_HASH
 from coordinator.settings import Settings
@@ -56,6 +57,8 @@ class Repository:
         )
         if not row:
             raise RunConflict
+        # Historical runs may have been created before the ten-bot team limit.
+        row["max_calls"] = min(row["max_calls"], MAX_SPECIALIST_CALLS)
         return row
 
     def _audit(self, conn, caller, requester, run_id, action, outcome, metadata=None):
@@ -101,6 +104,7 @@ class Repository:
                     [d.value for d in request.allowed_domains],
                     request.allow_collaboration,
                     min(
+                        MAX_SPECIALIST_CALLS,
                         request.max_specialist_calls,
                         settings.max_specialist_calls,
                         len(request.allowed_domains),
@@ -130,7 +134,7 @@ class Repository:
                 phase == "collaboration" and not row["allow_collaboration"]
             ):
                 raise AccessDenied
-            if row["calls_used"] >= row["max_calls"]:
+            if row["calls_used"] >= min(row["max_calls"], MAX_SPECIALIST_CALLS):
                 raise BudgetExceeded
             domain = conn.execute(
                 "SELECT id FROM specialist_domains WHERE slug = %s AND is_active",

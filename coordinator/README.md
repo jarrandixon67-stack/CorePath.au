@@ -80,7 +80,23 @@ This contract must be implemented and deployed through trusted machine identity 
 
 ## Work limits and recovery
 
-Defaults are four specialist calls per run, twenty starts per rolling day for each Personal AI service identity, one concurrent run, 3,000 output tokens per Coordinator model call and 80,000 JSON context characters. A run makes one planning call, at most one collaboration-review call and at most one synthesis call. There are no automatic retries or unattended scheduling loops. Specialist-side quotas still apply and may be more restrictive; configure both services together and apply provider-wide spend limits. These limits do not constitute a global currency budget.
+Requests default to four specialist calls per run. The default server capacity is
+nine specialist calls; a request must explicitly select a larger budget to use
+it. The hard limit is ten bots total: one Coordinator and up to nine distinct
+specialists, counting both initial and authorised follow-up assignments. All
+eleven disciplines remain available for selection. Persy is outside this internal
+team and still obtains member approval of the exact question and budget. Existing
+deployments with a capacity of four remain capped at four until reconfigured;
+old configurations above nine must be reduced. No database migration is required;
+historical run records are preserved, with the current cap applied at dispatch.
+
+Other defaults are twenty starts per rolling day for each Personal AI service
+identity, one concurrent run, 3,000 output tokens per Coordinator model call and
+80,000 JSON context characters. A run makes one planning call, at most one
+collaboration-review call and at most one synthesis call. There are no automatic
+retries or unattended scheduling loops. Specialist-side quotas still apply and
+may be more restrictive; configure both services together and apply provider-wide
+spend limits. These limits do not constitute a global currency budget.
 
 Permissions and a 180-second lease (also capped by the incoming token expiry) are checked between operations. In-flight network calls have their own timeouts and are not forcibly cancelled at the lease boundary. On the next start, expired active runs and unfinished tasks are marked failed so they release concurrency. Failed and evidence-empty starts count towards the daily limit. A timed-out specialist request may have completed remotely; it is recorded as uncertain/unavailable locally and is not automatically replayed. Production task reconciliation and background recovery remain future work.
 

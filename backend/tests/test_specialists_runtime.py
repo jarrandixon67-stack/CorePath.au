@@ -5,6 +5,7 @@ import httpx
 import pytest
 from pydantic import ValidationError
 
+from bot_standards import STANDARD, STANDARD_HASH, STANDARD_VERSION
 from specialists.models import InvalidEvidence, Proposal, ProviderUnavailable, Task
 from specialists.provider import OpenAIProvider
 from specialists.registry import SPECIALISTS, Domain, catalogue
@@ -186,10 +187,13 @@ def test_provider_uses_distinct_policy_strict_schema_no_tools_and_no_storage(mon
     settings = Settings(
         openai_api_key="synthetic-test-key", model="test-model", max_output_tokens=500
     )
-    for domain in (Domain.NUTRITION, Domain.FINANCIAL):
+    for domain in Domain:
         OpenAIProvider(settings).propose(SPECIALISTS[domain], {"question": "General evidence only"})
-    assert requests[0]["instructions"] != requests[1]["instructions"]
-    for request in requests:
+    assert len({r["instructions"] for r in requests}) == 11
+    for domain, request in zip(Domain, requests, strict=True):
+        assert STANDARD in request["instructions"]
+        assert SPECIALISTS[domain].mandate in request["instructions"]
+        assert SPECIALISTS[domain].boundary in request["instructions"]
         assert request["store"] is False and "tools" not in request
         assert request["max_output_tokens"] == 500
         schema = request["text"]["format"]["schema"]
@@ -198,6 +202,18 @@ def test_provider_uses_distinct_policy_strict_schema_no_tools_and_no_storage(mon
             if node.get("type") == "object":
                 assert node["additionalProperties"] is False
                 assert set(node["required"]) == set(node["properties"])
+
+
+def test_catalogue_exposes_per_domain_requirements_without_granting_tools_or_expertise():
+    records = catalogue()
+    assert len({tuple(r["tool_requirements"]) for r in records}) == 11
+    for record in records:
+        assert record["standard_version"] == STANDARD_VERSION
+        assert record["standard_hash"] == STANDARD_HASH
+        assert record["tool_requirements"] and record["evaluation_focus"]
+        assert record["expertise_status"] == "unverified_development_target"
+        assert not record["life_profile_access"] and not record["user_facing"]
+        assert record["peer_access"] == "coordinator_authorisation_required"
 
 
 @pytest.mark.parametrize(
