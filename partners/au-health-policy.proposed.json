@@ -1,0 +1,17 @@
+{
+  "name": "AU health and wellbeing trial v1 — proposed",
+  "country": "AU",
+  "sector": "health_and_wellbeing",
+  "max_age_days": 90,
+  "requirements": [
+    "identity_and_licensing",
+    "pricing_and_terms",
+    "quality_evidence",
+    "complaints_process",
+    "safety_and_regulatory",
+    "health_credentials_and_scope",
+    "health_claims_and_evidence",
+    "health_consent_and_referral",
+    "health_privacy_and_conflicts"
+  ]
+}
