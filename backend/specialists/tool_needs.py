@@ -7,6 +7,7 @@ import os
 from datetime import UTC, datetime
 from pathlib import Path
 
+from bot_standards import STANDARD_HASH, STANDARD_VERSION
 from specialists.models import InvalidEvidence, ProviderUnavailable
 from specialists.provider import TOOL_NEEDS_INSTRUCTIONS, OpenAIProvider
 from specialists.registry import SPECIALISTS, Domain
@@ -38,6 +39,10 @@ def consultation_context(domain: Domain):
         "name": bot.name,
         "mandate": bot.mandate,
         "current_boundary": bot.boundary,
+        "standard_version": STANDARD_VERSION,
+        "standard_hash": STANDARD_HASH,
+        "developer_proposed_tools": list(bot.tool_requirements),
+        "evaluation_focus": list(bot.evaluation_focus),
         "development_requirements": REQUIREMENTS,
         "current_tools": [],
         "current_tools_note": "This planning consultation has no callable tools or user data.",
@@ -49,6 +54,8 @@ def consult(domain, provider, settings):
     row = {
         "domain": domain.value,
         "model": settings.model_for(domain),
+        "standard_version": STANDARD_VERSION,
+        "standard_hash": STANDARD_HASH,
         "consulted_at": datetime.now(UTC).isoformat(),
         "brief_hash": hashlib.sha256(json.dumps(context, sort_keys=True).encode()).hexdigest(),
         "consultation_policy_hash": hashlib.sha256(TOOL_NEEDS_INSTRUCTIONS.encode()).hexdigest(),
@@ -81,6 +88,8 @@ def main(argv=None):
         parser.error("Choose each discipline at most once")
     report = {
         "scope": "tool_needs_planning_only",
+        "standard_version": STANDARD_VERSION,
+        "standard_hash": STANDARD_HASH,
         "live_model_consulted": False,
         "permissions_granted": False,
         "expertise_verified": False,

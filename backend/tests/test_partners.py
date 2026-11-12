@@ -532,9 +532,18 @@ def test_model_proposals_must_cite_exact_registered_excerpts():
             json={"output": [{"content": [{"type": "output_text", "text": json.dumps(draft)}]}]},
         )
 
-    with httpx.Client(
-        transport=httpx.MockTransport(lambda r: response("verified registry excerpt"))
-    ) as client:
+    def grounded_response(request):
+        import json
+
+        from bot_standards import STANDARD
+
+        body = json.loads(request.content)
+        assert STANDARD in body["input"][0]["content"]
+        assert "Do not make a partnership decision or send messages" in body["input"][0]["content"]
+        assert "tools" not in body and body["store"] is False
+        return response("verified registry excerpt")
+
+    with httpx.Client(transport=httpx.MockTransport(grounded_response)) as client:
         assert propose(
             snapshot, settings(openai_api_key="synthetic", model="synthetic"), client=client
         ).proposals

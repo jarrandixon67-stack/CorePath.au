@@ -5,6 +5,12 @@ milestone. This document does not certify comprehensive expertise, clinical
 accuracy, financial competence or live deployment. A larger prompt is not an
 expert qualification.
 
+The founder subsequently approved applying this standard to all bots. The
+[shared bot standard](BOT-STANDARD.md) now covers all sixteen implemented AI
+roles. Every specialist has an expanded mandate, explicit proposed tool
+requirements and domain-specific evaluation focus in the canonical catalogue.
+Role-specific permissions and output contracts remain in force.
+
 ## Agreed direction
 
 - Understand brief, informal descriptions and ask only materially necessary

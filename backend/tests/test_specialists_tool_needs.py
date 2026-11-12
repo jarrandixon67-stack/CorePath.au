@@ -5,6 +5,7 @@ import httpx
 import pytest
 from pydantic import ValidationError
 
+from bot_standards import STANDARD, STANDARD_HASH
 from specialists import tool_needs
 from specialists.models import InvalidEvidence, ToolNeeds
 from specialists.registry import Domain
@@ -60,9 +61,12 @@ def test_live_consultation_uses_selected_domain_model_and_has_no_callable_tools(
         assert payload["text"]["format"]["strict"] is True
         assert payload["text"]["format"]["name"] == "specialist_tool_needs"
         assert "cannot grant yourself" in payload["instructions"]
+        assert STANDARD in payload["instructions"]
         context = json.loads(payload["input"][0]["content"])
         assert context["discipline"] == Domain.NUTRITION and context["current_tools"] == []
         assert "blood" in context["development_requirements"]
+        assert context["standard_hash"] == STANDARD_HASH
+        assert context["developer_proposed_tools"] and context["evaluation_focus"]
         return httpx.Response(
             200,
             json={
@@ -97,6 +101,7 @@ def test_live_consultation_uses_selected_domain_model_and_has_no_callable_tools(
     row = report["results"][0]
     assert row["state"] == "live_model_response" and row["response"]["requests"]
     assert not row["permissions_granted"] and row["review_required"]
+    assert row["standard_hash"] == report["standard_hash"] == STANDARD_HASH
     assert len(row["brief_hash"]) == len(row["specialist_policy_hash"]) == 64
     assert len(row["consultation_policy_hash"]) == 64
     # An existing report must fail before another paid call and remain unchanged.

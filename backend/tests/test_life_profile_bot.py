@@ -4,6 +4,7 @@ import httpx
 import pytest
 from pydantic import ValidationError
 
+from bot_standards import STANDARD
 from life_profile.bot import LifeProfileBot
 from life_profile.models import AnalyseRequest, Category, Consent, Proposal
 from life_profile.provider import InvalidProposal, OpenAIProvider, ProviderUnavailable
@@ -243,6 +244,8 @@ def test_provider_uses_structured_output_without_storing_responses(monkeypatch):
     ).propose({})
     assert output.observations[0].kind == "user_statement"
     assert captured["store"] is False
+    assert STANDARD in captured["instructions"]
+    assert "write accepted profile facts" in captured["instructions"]
     assert captured["text"]["format"]["strict"] is True
     assert captured["text"]["format"]["schema"]["additionalProperties"] is False
 

@@ -318,6 +318,9 @@ def test_model_planner_uses_strict_required_schema_and_has_no_tools(monkeypatch)
     )
     assert provider.plan({"question": "General research question"}) == plan
     body = seen[0]
+    from bot_standards import STANDARD
+
+    assert STANDARD in body["instructions"]
     assert body["store"] is False and "tools" not in body
     schema = body["text"]["format"]["schema"]
     for node in [schema, *schema["$defs"].values()]:

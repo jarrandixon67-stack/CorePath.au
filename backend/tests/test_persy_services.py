@@ -295,6 +295,9 @@ def test_persy_model_uses_distinct_policy_strict_schema_no_tools_and_no_storage(
     assert provider.reply({"member_message": "A synthetic question"}) == reply
     body = calls[0]
     assert body["store"] is False and "tools" not in body
+    from bot_standards import STANDARD
+
+    assert STANDARD in body["instructions"]
     assert "Your name is Persy" in body["instructions"]
     schema = body["text"]["format"]["schema"]
     for node in [schema, *schema["$defs"].values()]:

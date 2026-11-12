@@ -2,6 +2,7 @@
 
 | Document | Purpose |
 |---|---|
+| [Shared bot standard](BOT-STANDARD.md) | Common quality standard across sixteen AI roles, individual remits, proposed tools and verification limits |
 | [Specialist capability requirements](SPECIALIST-CAPABILITIES.md) | Requested expertise, ten-bot teams, Nutrition/Finance tools, tool consultations and evaluation gates |
 | [Feedback Bot](../feedback/README.md) | Private feedback, permitted review analysis and human concern review; separate permissions and consent |
 | [Australian health partner standard](partners/AU-HEALTH-STANDARD.md) | Five approved baseline requirements and proposed health-specific requirements; no live campaign |
