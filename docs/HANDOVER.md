@@ -18,11 +18,12 @@ The immediate build is the shared knowledge foundation for eleven specialist dom
 ## Current continuation
 
 The founder's latest [agreed rules](AGREED-RULES.md) replace the earlier
-nine-specialist ceiling: full discussions include all eleven specialists and the
-Chief of Staff. A shared canonical policy now governs the older services and
+mandatory all-eleven execution rule: Auto now selects only necessary specialists,
+while all eleven remain available and full mode is an explicit request. A shared canonical policy now governs the older services and
 replacement foundation. The older research path can dispatch all eleven and
 rejects incomplete full-team plans; the replacement foundation also implements
-bounded peer review. Normal chat integration remains pending. Explicitly scoped
+bounded peer review. Normal specialist-chat integration remains pending. The base offer is A$19.99/month
+including GST; checkout and included usage remain unconfigured. Explicitly scoped
 research keeps its narrower permissions and reports coverage honestly.
 
 [The capability specification](SPECIALIST-CAPABILITIES.md) records discipline

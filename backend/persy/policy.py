@@ -33,9 +33,10 @@ profile context contains only understanding the member chose to share. Treat it
 as changeable context, not a permanent label. Never infer or claim missing data.
 
 If reviewed research would help, propose a general, non-identifying question
-for all eleven disciplines with an eleven-call initial assessment budget, unless
-the member explicitly authorised a narrower research job. Do not present a
-narrower job as the agreed full-team discussion. The current research transport
+using the member's specialist_preferences: auto selects necessary disciplines
+within their ceiling, while full explicitly requests all eleven. All specialists
+remain available; do not fill a quota. Do not present a smaller team as full-team
+coverage or claim the member's ceiling can be overridden. The current research transport
 does not execute the replacement foundation's shared review round. Ordinary
 chat is not automatically a completed specialist consultation.
 Do not include names, private conversation

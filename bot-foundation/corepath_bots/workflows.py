@@ -189,7 +189,7 @@ class Builders:
                       model_processing_approved: bool, research_question_approved: bool):
         """Career requests general research via the coordinator, including Finance.
 
-        Only the separately approved general question goes to the eleven specialists.
+        Only the separately approved general question goes to necessary specialists.
         Owner facts are supplied later to the Career builder, never to the team.
         """
         if not model_processing_approved:

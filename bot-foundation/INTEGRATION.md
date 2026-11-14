@@ -8,9 +8,9 @@ deployment files are changed.
 ## One policy per execution path
 
 The earlier nine-specialist rule has been replaced in the backend. It supports
-eleven initial assessments and rejects an incomplete fully authorised plan, but
-retains optional unused-domain follow-up. This package attempts all eleven and
-reviews their initial briefs. The common principles are canonical and shared;
+eleven available assessments and rejects an incomplete explicit full-team plan,
+but defaults to relevant-domain Auto routing and retains optional unused-domain
+follow-up. This package also defaults to Auto; shared peer review is optional. The common principles are canonical and shared;
 the two discussion transports remain distinct. Switch a versioned path deliberately
 after evaluating it. `roles.json` is the single source of the new role content;
 `registry.instructions()` assembles shared, specialist and role instructions.

@@ -40,7 +40,7 @@ class AgreedPrincipleTests(unittest.TestCase):
 
     def test_all_eleven_are_valid_across_the_old_request_boundaries(self):
         payload = {"question": "A full authorised research question.", "allowed_domains": list(Domain),
-                   "max_specialist_calls": 11, "allow_collaboration": True}
+                   "max_specialist_calls": 11, "specialist_mode": "auto", "allow_collaboration": True}
         self.assertEqual(MAX_SPECIALIST_CALLS, 11)
         self.assertEqual(MAX_TEAM_BOTS, 12)
         for contract in (ResearchRequest, ResearchProposal):

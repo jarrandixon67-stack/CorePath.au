@@ -18,6 +18,8 @@ class DemoProvider:
 
     def generate(self, role_id, stage, context, contract):
         self.calls.append((role_id, stage, context))
+        if stage == "select_necessary_specialists":
+            return {"domains": [Domain.PERSONAL.value], "rationale": "Synthetic single-domain routing fixture only."}
         if role_id in {d.value for d in Domain}:
             return {
                 "relevant": True, "summary": f"Synthetic workflow contribution from {role_id}.",
@@ -36,7 +38,7 @@ class DemoProvider:
                     "confidence": "low", "limitations": "This demonstrates routing and validation, not specialist expertise."}],
                 "disagreements": [], "gaps": ["No live research was performed."], "questions": [],
                 "feedback": [{"domain": d.value, "contribution": "Synthetic contribution received." if d.value in available else "Contribution unavailable.",
-                              "improvement": "Evaluate with reviewed evidence and live-model scenarios before deployment."} for d in Domain],
+                              "improvement": "Evaluate with reviewed evidence and live-model scenarios before deployment."} for d in map(Domain, context.get("assigned_domains", list(Domain)))],
             }
         if role_id == "persy":
             return {"opening": "Here is the demonstration team's draft.",

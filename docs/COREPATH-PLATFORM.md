@@ -107,7 +107,7 @@ Information access and authority to change information are separate permissions.
 
 ## 8. Commercial direction
 
-Build a sustainable global platform through appropriate partnerships, specialist services, referrals, knowledge/education and additional products/services that provide genuine value. Do not silently discard existing membership decisions merely because this summary does not repeat their pricing.
+Build a sustainable global platform through appropriate partnerships, specialist services, referrals, knowledge/education and additional products/services that provide genuine value. The founder-approved base membership is A$19.99/month including GST, with Auto specialist selection. Included usage and paid extras must be costed before enabling checkout. All eleven fields remain available; the base offer does not promise unlimited usage.
 
 The approved Global Business Partner Programme direction includes a fixed commission model, global recruitment, outbound invitations and inbound applications, a standard partner agreement, automated invitations/follow-up, and quality/verification requirements. **10% is the proposed commission**, not a claim that a partner agreement is already implemented.
 

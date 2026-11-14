@@ -19,10 +19,10 @@ Role-specific permissions and output contracts remain in force.
   practical next steps. Offer more detail when the individual wants it.
 - Distinguish evidence-supported best practice from a smallest useful action
   when appropriate. State trade-offs; retain essential safety and legal steps.
-- A full discussion includes **all eleven specialists plus the Coordinator**.
-  Each makes a concise relevant contribution or states there is nothing relevant.
-  The Coordinator evaluates evidence, preserves disagreement and gives feedback.
-  Explicitly scoped research jobs may use fewer but must not claim full coverage.
+- **Auto is the default:** select only necessary specialists; all eleven remain
+  available. A member count is a ceiling, not a quota. Full mode explicitly requests
+  all eleven plus the Coordinator. Preserve disagreement, give feedback to assigned
+  specialists and report actual coverage; never claim unused specialists contributed.
 - Ask each specialist which tools it needs. Its answer is a proposed development
   requirement, not a grant of access or evidence that the tool works.
 

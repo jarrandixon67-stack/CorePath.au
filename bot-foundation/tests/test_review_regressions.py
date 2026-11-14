@@ -31,7 +31,7 @@ class OutputPreservationTests(unittest.TestCase):
                 if role_id in SPECIALIST_IDS:
                     output["claims"][0]["limitations"] = "A critical limitation in the supporting source."
                 return output
-        result = Team(Warnings()).discuss("Check warning preservation.", demo_sources(), approved_for_all_specialists=True)
+        result = Team(Warnings()).discuss("Check warning preservation.", demo_sources(), approved_for_all_specialists=True, mode="full")
         for text in ("Important fixture uncertainty", "A material fixture question?",
                      "A qualified fixture review", "A critical limitation"):
             self.assertIn(text, result["persy_draft"])
@@ -47,14 +47,14 @@ class OutputPreservationTests(unittest.TestCase):
                 if role_id == "chief-of-staff":
                     output["conclusions"] = []
                 return output
-        result = Team(NoEvidence()).discuss("Check missing evidence.", [], approved_for_all_specialists=True)
+        result = Team(NoEvidence()).discuss("Check missing evidence.", [], approved_for_all_specialists=True, mode="full")
         self.assertEqual(len(result["contributions"]), 11)
         self.assertEqual(result["state"], "needs_evidence")
 
     def test_copied_source_cannot_bypass_public_approval_validation(self):
         source = demo_sources()[0].model_copy(update={"public": False})
         with self.assertRaises(ValidationError):
-            Team(DemoProvider()).discuss("Check copied approval flags.", [source], approved_for_all_specialists=True)
+            Team(DemoProvider()).discuss("Check copied approval flags.", [source], approved_for_all_specialists=True, mode="full")
 
 
 class ProviderFailureTests(unittest.TestCase):

@@ -81,9 +81,10 @@ This contract must be implemented and deployed through trusted machine identity 
 ## Work limits and recovery
 
 Requests and server capacity default to eleven specialist calls. A full team is
-one Coordinator plus all eleven specialists. If all eleven domains and the full
-budget are authorised, the initial plan must cover all eleven or is rejected
-before dispatch. Explicitly scoped jobs may use fewer; their permissions are
+one Coordinator plus all eleven specialists. Auto selects only necessary domains even when all eleven are authorised.
+Only an explicit `specialist_mode: "full"` request requires every initial
+assessment; missing domains are rejected before dispatch. A numeric budget is
+a ceiling, not a quota. Explicitly scoped jobs may use fewer; their permissions are
 never broadened automatically. Reports expose actual coverage and distinguish
 initial assessment from a shared peer-review round, which this older transport
 does not execute. Persy still obtains approval of the exact question and scope.

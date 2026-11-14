@@ -12,6 +12,17 @@ from pydantic import BaseModel
 from .registry import instructions
 
 
+def output_budget(stage: str) -> int:
+    # Bounded output allowances. A cap is not proof of cost or output quality;
+    # truncated/invalid structured results continue to fail closed, without retry.
+    return {
+        "select_necessary_specialists": 700,
+        "initial_assessment": 1600,
+        "peer_review": 1600,
+        "present_reviewed_team_draft": 900,
+    }.get(stage, 3500)
+
+
 class ProviderError(RuntimeError):
     pass
 
@@ -51,7 +62,7 @@ class OpenAIProvider:
             "model": self.model, "store": False,
             "instructions": instructions(role_id, stage),
             "input": [{"role": "user", "content": data}],
-            "max_output_tokens": 3500,
+            "max_output_tokens": output_budget(stage),
             "text": {"format": {"type": "json_schema", "name": "corepath_output",
                                 "strict": True, "schema": schema}},
         }).encode()

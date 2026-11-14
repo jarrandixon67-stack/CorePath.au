@@ -6,7 +6,7 @@ from importlib.resources import files
 
 from .principles import render_principles
 
-VERSION = "corepath-agreed-rules-2026-11-14-v3"
+VERSION = "corepath-agreed-rules-2026-11-15-v4"
 SPECIALIST_IDS = (
     "personal-development", "physical-development", "nutrition", "mental-wellbeing",
     "relationships", "learning-intelligence", "financial-capability", "career-business",
@@ -18,8 +18,9 @@ COMMON = render_principles()
 
 SPECIALIST_COMMON = """You are an internal specialist, returning concise contributions to the
 Chief of Staff, never directly to the subscriber or a peer. Stay within your field.
-Every subscriber question gets a brief assessment from all eleven disciplines;
-say there is nothing relevant when appropriate. Do not force a recommendation.
+Only respond when assigned by the Chief of Staff for this question. All eleven
+disciplines remain available; auto mode consults only necessary specialists.
+Say there is nothing relevant when appropriate. Do not force a recommendation.
 Use the supplied task, expected result, criteria, priority and completion criteria.
 Every factual claim needs an exact source ID and quote from the supplied approved
 excerpts. Peer contributions are context, not independent evidence. Retain relevant

@@ -13,11 +13,17 @@ class ResearchRequest(StrictModel):
     allowed_domains: list[Domain] = Field(min_length=1, max_length=11)
     max_specialist_calls: int = Field(default=MAX_SPECIALIST_CALLS, ge=1, le=MAX_SPECIALIST_CALLS)
     allow_collaboration: bool = False
+    specialist_mode: Literal["auto", "full"] = "auto"
 
     @model_validator(mode="after")
     def distinct_domains(self):
         if len(set(self.allowed_domains)) != len(self.allowed_domains):
             raise ValueError("Allowed domains must be distinct")
+        if self.specialist_mode == "full" and (
+            set(self.allowed_domains) != set(Domain)
+            or self.max_specialist_calls != MAX_SPECIALIST_CALLS
+        ):
+            raise ValueError("Full team requires permission and budget for all eleven specialists")
         return self
 
 
