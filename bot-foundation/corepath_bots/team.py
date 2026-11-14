@@ -7,7 +7,7 @@ from pydantic import ValidationError
 
 from .contracts import Assignment, Contribution, Domain, PersyReply, Source, Synthesis
 from .provider import Provider, ProviderError
-from .registry import SPECIALIST_IDS, VERSION, policy_hash
+from .registry import VERSION, policy_hash
 
 CONFIDENCE = {"low": 0, "moderate": 1, "high": 2}
 
@@ -117,7 +117,7 @@ class Team:
             if monotonic() - start >= self.limits.deadline_seconds:
                 raise ProviderError("Discussion deadline reached before result acceptance")
             validated = contract.model_validate(output)
-            receipts.append({"role": role_id, "stage": stage, "policy_hash": policy_hash(role_id)})
+            receipts.append({"role": role_id, "stage": stage, "policy_hash": policy_hash(role_id, stage)})
             return validated
 
         def specialist(domain, stage, peers=None):
@@ -152,6 +152,12 @@ class Team:
             issues.append("peer_review_skipped_due_to_budget_or_incomplete_initial_team")
 
         public_results = {d.value: c.model_dump(mode="json") for d, c in results.items()}
+        # Keep these outside model-written synthesis so a shorter response
+        # cannot silently remove a specialist's warning, referral or question.
+        specialist_gaps = list(dict.fromkeys(gap for c in results.values() for gap in c.gaps))
+        specialist_questions = list(dict.fromkeys(q for c in results.values() for q in c.questions))
+        referrals = [{"domain": d.value, "reason": c.referral_reason}
+                     for d, c in results.items() if c.referral_reason]
         report = {
             "version": VERSION, "state": "partial", "review_required": True,
             "question": question, "assignments": [a.model_dump(mode="json") for a in assignments.values()],
@@ -159,6 +165,9 @@ class Team:
             "source_catalogue": [{"id": s.id, "title": s.title, "url": s.url,
                                   "checked_at": s.checked_at} for s in sources],
             "issues": issues, "receipts": receipts, "synthesis": None, "persy_draft": None,
+            "specialist_knowledge_gaps": specialist_gaps,
+            "specialist_questions": specialist_questions, "referral_needs": referrals,
+            "supporting_evidence": [],
             "evidence_note": "Exact quotes establish traceability, not truth or semantic entailment. Human review remains required.",
         }
         try:
@@ -168,8 +177,18 @@ class Team:
             }, Synthesis)
             validate_synthesis(synthesis, results)
             report["synthesis"] = synthesis.model_dump(mode="json")
+            referenced = {(ref.domain, ref.index) for c in synthesis.conclusions for ref in c.references}
+            referenced.update((ref.domain, ref.index) for d in synthesis.disagreements
+                              for ref in d.supporting + d.challenging)
+            report["supporting_evidence"] = [
+                {"domain": domain.value, "claim_index": index,
+                 "claim": results[domain].claims[index].model_dump(mode="json")}
+                for domain, index in sorted(referenced)
+            ]
             reply = generate("persy", "present_reviewed_team_draft", {
                 "question": question, "synthesis": report["synthesis"], "issues": issues,
+                "specialist_knowledge_gaps": specialist_gaps,
+                "specialist_questions": specialist_questions, "referral_needs": referrals,
                 "instructions": "Use a brief non-factual greeting/opening. Select all material conclusions by index, omit no significant uncertainty. No new factual advice in opening or closing. Draft only; do not claim a user has already received it.",
             }, PersyReply)
             indexes = reply.conclusion_indexes
@@ -182,12 +201,21 @@ class Team:
                 blocks.append(c.statement + "\nLimitations: " + c.limitations)
             blocks.extend("Different perspectives: " + d.description for d in synthesis.disagreements)
             blocks.extend("Uncertainty: " + gap for gap in synthesis.gaps)
+            blocks.extend("Specialist uncertainty: " + gap for gap in specialist_gaps)
+            blocks.extend("Referral needed (" + item["domain"] + "): " + item["reason"] for item in referrals)
+            blocks.extend("Specialist clarification: " + q for q in specialist_questions)
+            caveats = dict.fromkeys(item["claim"]["limitations"] for item in report["supporting_evidence"])
+            blocks.extend("Supporting evidence limitation: " + caveat for caveat in caveats)
+            cited_ids = {citation["source_id"] for item in report["supporting_evidence"]
+                         for citation in item["claim"]["citations"]}
+            blocks.extend("Source: " + s.title + " — " + s.url for s in sources if s.id in cited_ids)
             blocks.extend("Team issue: " + issue for issue in issues)
             blocks.extend("Clarification needed: " + q for q in synthesis.questions)
             if reply.closing_question:
                 blocks.append(reply.closing_question)
             report["persy_draft"] = "\n\n".join(blocks)
-            report["state"] = "completed" if not issues and len(results) == 11 else "partial"
+            report["state"] = ("partial" if issues or len(results) != 11 else
+                               "completed" if any(c.claims for c in results.values()) else "needs_evidence")
         except (ProviderError, ValidationError, InvalidEvidence):
             issues.append("coordination_or_persy_output_unavailable_or_invalid")
         report["calls_attempted"] = calls

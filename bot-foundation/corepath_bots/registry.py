@@ -4,7 +4,7 @@ import hashlib
 import json
 from importlib.resources import files
 
-VERSION = "corepath-agreed-foundation-2026-11-14"
+VERSION = "corepath-reviewed-foundation-2026-11-14-v2"
 SPECIALIST_IDS = (
     "personal-development", "physical-development", "nutrition", "mental-wellbeing",
     "relationships", "learning-intelligence", "financial-capability", "career-business",
@@ -57,6 +57,27 @@ let commission determine suitability. Tools listed in your remit are development
 requirements, not proof that this runtime provides them.
 """
 
+BUILDER_STAGES = {
+    "nutrition": {"everyday_meal_plan"},
+    "physical-development": {"bodyweight_first_plan"},
+    "career-business": {"resume", "cover_letter", "business_plan"},
+}
+
+BUILDER_COMMON = """This is an internal Chief-of-Staff-authorised drafting job, not a
+source-library research assessment or a direct subscriber conversation. Return
+the supplied structured draft contract to the coordinator for Persy and human
+review. Use only the specific owner inputs approved for this job and any supplied
+coordinator research. You have no Life Profile, journal, bank, peer or browsing
+access. Do not retain these private inputs as general research or send them to 12.
+Do not add source-quote fields that are absent from the draft output contract.
+Career/business assertions must reference supplied fact IDs or actual coordinator
+conclusions; mark planning assumptions explicitly. Meal and training outputs are
+reviewable suggestions within the supplied restrictions, not established factual
+health claims, diagnoses or prescriptions. Never invent clinical results,
+nutrient calculations, credentials, market facts, health outcomes or actions.
+Retain required limitations, review checks and appropriate referral boundaries.
+"""
+
 
 def roles() -> dict:
     return json.loads(files("corepath_bots").joinpath("roles.json").read_text())
@@ -66,14 +87,21 @@ def role(role_id: str) -> dict:
     return roles()[role_id]
 
 
-def instructions(role_id: str) -> str:
+def instructions(role_id: str, stage: str | None = None) -> str:
     definition = role(role_id)
     body = [VERSION, COMMON]
     if role_id in SPECIALIST_IDS:
-        body.append(SPECIALIST_COMMON)
+        if stage in BUILDER_STAGES.get(role_id, set()):
+            body.append(BUILDER_COMMON)
+        elif stage in {None, "initial_assessment", "peer_review"}:
+            body.append(SPECIALIST_COMMON)
+        else:
+            raise ValueError("Unsupported specialist execution stage")
     body.extend([f"ROLE: {definition['name']}", json.dumps(definition, ensure_ascii=False)])
+    if stage is not None:
+        body.append("STAGE: " + stage)
     return "\n\n".join(body)
 
 
-def policy_hash(role_id: str) -> str:
-    return hashlib.sha256(instructions(role_id).encode()).hexdigest()
+def policy_hash(role_id: str, stage: str | None = None) -> str:
+    return hashlib.sha256(instructions(role_id, stage).encode()).hexdigest()

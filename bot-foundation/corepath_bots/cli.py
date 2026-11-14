@@ -7,7 +7,7 @@ from pathlib import Path
 from .contracts import Source
 from .demo import DemoProvider, demo_sources
 from .provider import OpenAIProvider
-from .registry import instructions, policy_hash, roles
+from .registry import BUILDER_STAGES, instructions, policy_hash, roles
 from .team import Team
 
 
@@ -33,7 +33,9 @@ def main():
         destination.mkdir(parents=True, exist_ok=True)
         for key in roles():
             (destination / (key + ".md")).write_text(instructions(key) + "\n")
-        print(f"Exported {len(roles())} role instructions.")
+            for stage in sorted(BUILDER_STAGES.get(key, set())):
+                (destination / (key + "--" + stage + ".md")).write_text(instructions(key, stage) + "\n")
+        print(f"Exported {len(roles())} roles and their stage-specific draft instructions.")
     else:
         if args.command == "demo":
             report = Team(DemoProvider()).discuss("Demonstrate the all-eleven collaboration workflow.", demo_sources(),

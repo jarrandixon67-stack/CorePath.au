@@ -65,9 +65,14 @@ tests during service integration.
 - Jobs need durable idempotency and retries with remaining-budget checks. The
   local reminder helper takes a previously delivered date; delivery systems must
   persist and atomically claim that key before sending. It is not a durable queue.
-- The local SQL store assumes a trusted single application process. Multi-worker
-  concurrency, transactional consent race protection, encrypted persistence and
-  per-service database credentials need production-specific implementation.
+- The local SQL store uses explicit short write transactions for consent
+  decisions and 12's result acceptance, with no network requests under those
+  locks. Production multi-worker jobs, encryption, database isolation, durable
+  cancellation and per-service credentials still need integration and evaluation.
+- Profile excerpts must carry reviewed category/sensitivity metadata. Do not
+  forward whole raw conversations and rely on output filtering after a model
+  has received them. Treat this as an intentional input-contract change and
+  authenticate the coordinator before constructing draft builders.
 - A model can still make an unsupported paraphrase despite a matching source
   quote. Keep independent evidence and response review; structural checks are
   necessary but insufficient.

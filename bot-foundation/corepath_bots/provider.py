@@ -2,6 +2,7 @@
 
 import json
 import os
+from http.client import HTTPException
 import urllib.error
 import urllib.request
 from typing import Protocol
@@ -48,7 +49,7 @@ class OpenAIProvider:
         # All output-contract fields above have no defaults.
         body = json.dumps({
             "model": self.model, "store": False,
-            "instructions": instructions(role_id) + "\nSTAGE: " + stage,
+            "instructions": instructions(role_id, stage),
             "input": [{"role": "user", "content": data}],
             "max_output_tokens": 3500,
             "text": {"format": {"type": "json_schema", "name": "corepath_output",
@@ -65,13 +66,30 @@ class OpenAIProvider:
             if len(payload) > 300000:
                 raise ProviderError("Model response exceeded the response budget")
             result = json.loads(payload)
+            if not isinstance(result, dict):
+                raise ValueError("Expected a response object")
             if result.get("status") != "completed":
                 raise ProviderError("Model returned an incomplete response")
-            text = "".join(part["text"] for item in result.get("output", [])
-                           if item.get("type") == "message"
-                           for part in item.get("content", [])
-                           if part.get("type") == "output_text")
+            items = result.get("output")
+            if not isinstance(items, list):
+                raise ValueError("Expected an output list")
+            texts = []
+            for item in items:
+                if not isinstance(item, dict):
+                    raise ValueError("Invalid output item")
+                if item.get("type") != "message":
+                    continue
+                if not isinstance(item.get("content"), list):
+                    raise ValueError("Invalid message content")
+                for part in item["content"]:
+                    if not isinstance(part, dict):
+                        raise ValueError("Invalid content item")
+                    if part.get("type") == "output_text":
+                        if not isinstance(part.get("text"), str):
+                            raise ValueError("Invalid output text")
+                        texts.append(part["text"])
+            text = "".join(texts)
             return contract.model_validate_json(text).model_dump(mode="json")
-        except (urllib.error.URLError, TimeoutError, ValueError, KeyError, TypeError) as exc:
+        except (OSError, HTTPException, ValueError, KeyError, TypeError) as exc:
             # Do not log responses/requests or secrets in this exception.
             raise ProviderError("Model request failed or output did not match its contract") from exc

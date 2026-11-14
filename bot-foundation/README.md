@@ -5,6 +5,11 @@ This package implements the foundation agreed with the founder on 14 November
 onto the existing services. Importing or running the demo starts no background
 research, messages, bank access, outreach, deployment or spending.
 
+Version 0.2.1 incorporates the [second code review](CODE_REVIEW.md). Research
+and coordinator-authorised drafting use separate stage-specific instructions;
+model instances are revalidated at hand-off, and specialist warnings cannot be
+silently dropped from Persy's draft.
+
 The existing `backend/` services still use their earlier contracts and are not
 automatically switched to this package. Their nine-specialist selection policy
 must not be combined with this package's all-eleven discussion policy. See
@@ -97,12 +102,31 @@ are allowed profile context through this library interface. Specialists and 12
 receive no automatic private profile context. The all-team question itself must
 be explicitly approved because it may otherwise contain personal information.
 
+Life Profile input must now be reviewed excerpts with explicit
+`Message.categories` and `Message.sensitive` metadata supplied by the trusted
+application/owner review flow. Unclassified input is rejected rather than guessed.
+Categories and sensitivity are checked before model transmission and again
+before recording proposals. These labels are not automatic content classification:
+the application must review them accurately. Conversation IDs remain with evidence.
+Corrections are conservatively marked sensitive; sharing them requires the
+corresponding permission. Consent revisions are not reused after owner erasure.
+
+Draft builders require `Builders(provider, caller_role="chief-of-staff")`; the
+application authenticates this role before construction. This internal
+coordinator facade is not a direct subscriber-to-specialist channel.
+
 12 is disabled initially. The founder alone enables, assigns, shuts down or
 erases it. Shutdown rejects new runs and discards an in-flight response before
 acceptance; it cannot instantly stop computation already executing at a model
 provider. Logical local report deletion does not physically erase SQLite pages,
 backups, provider records or external effects. No actual notification channel is
 configured to report to the founder.
+
+Short SQLite acceptance transactions lock before checking consent, shutdown and
+evidence, protecting the check/write boundary across connections. Reports from
+12 retain source fingerprints; changed or retracted findings mark the report's
+evidence as needing review. Production jobs, cancellation, authentication and
+encrypted storage still need separate integration.
 
 Exact source quotes and valid reference IDs establish traceability, not truth,
 claim entailment, safe applicability or professional competence. All generated
