@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "corepath-bot-foundation"
-version = "0.2.2"
-description = "Reviewable CorePath bot foundation and bounded eleven-specialist collaboration"
+version = "0.3.0"
+description = "Reviewable CorePath bot foundation and necessary-specialist routing and optional full-team collaboration"
 requires-python = ">=3.11"
 dependencies = ["pydantic>=2.4,<3"]
 

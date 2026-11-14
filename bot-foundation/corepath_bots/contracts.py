@@ -25,6 +25,17 @@ class Domain(StrEnum):
     RECREATION = "recreation-discovery"
 
 
+class RoutingPlan(Model):
+    domains: list[Domain] = Field(min_length=1, max_length=11)
+    rationale: str = Field(min_length=3, max_length=800)
+
+    @model_validator(mode="after")
+    def unique_domains(self):
+        if len(set(self.domains)) != len(self.domains):
+            raise ValueError("Routing cannot repeat a specialist")
+        return self
+
+
 class Source(Model):
     id: str = Field(min_length=1, max_length=100)
     title: str = Field(min_length=1, max_length=300)
@@ -104,7 +115,7 @@ class Synthesis(Model):
     disagreements: list[Disagreement] = Field(max_length=6)
     gaps: list[str] = Field(max_length=12)
     questions: list[str] = Field(max_length=3)
-    feedback: list[Feedback] = Field(min_length=11, max_length=11)
+    feedback: list[Feedback] = Field(min_length=1, max_length=11)
 
 
 class PersyReply(Model):

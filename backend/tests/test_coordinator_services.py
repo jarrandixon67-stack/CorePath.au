@@ -32,6 +32,7 @@ def test_all_eleven_specialists_fit_request_configuration_and_persy_boundaries()
         "question": "Research the relevant evidence",
         "allowed_domains": list(Domain),
         "max_specialist_calls": 11,
+        "specialist_mode": "auto",
         "allow_collaboration": True,
     }
     assert len(ResearchRequest.model_validate(payload).allowed_domains) == 11

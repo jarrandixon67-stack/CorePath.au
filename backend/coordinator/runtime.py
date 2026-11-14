@@ -141,12 +141,16 @@ class Runtime:
         tasks, issues = [], []
         try:
             row = repo.check(caller, run_id, settings)
+            if request.specialist_mode == "full" and row["max_calls"] < MAX_SPECIALIST_CALLS:
+                raise BudgetExceeded("Server capacity cannot cover the requested full team")
             full_team_requested = (
-                len(request.allowed_domains) == MAX_SPECIALIST_CALLS
+                request.specialist_mode == "full"
+                and len(request.allowed_domains) == MAX_SPECIALIST_CALLS
                 and row["max_calls"] == MAX_SPECIALIST_CALLS
             )
             context = {
                 "question": request.question,
+                "specialist_mode": request.specialist_mode,
                 "allowed_specialists": [
                     bot for bot in catalogue() if bot["domain"] in request.allowed_domains
                 ],
@@ -174,6 +178,8 @@ class Runtime:
                 "clarifying_questions": plan.questions,
                 "allowed_domains": [domain.value for domain in request.allowed_domains],
                 "call_budget": row["max_calls"],
+                "specialist_mode": request.specialist_mode,
+                "budget_is_ceiling_not_target": True,
                 "team_bot_limit": MAX_TEAM_BOTS,
                 "team_count_includes": "coordinator_and_dispatched_specialists",
                 "full_team_requested": full_team_requested,
@@ -227,10 +233,8 @@ class Runtime:
                     tasks.append(task)
 
             dispatch(plan.assignments, "initial")
-            report["full_team_assessed"] = (
-                full_team_requested
-                and len(tasks) == MAX_SPECIALIST_CALLS
-                and all(task["result"] is not None for task in tasks)
+            report["full_team_assessed"] = len(tasks) == MAX_SPECIALIST_CALLS and all(
+                task["result"] is not None for task in tasks
             )
             row = repo.check(caller, run_id, settings)
             used = {task["domain"] for task in tasks}
@@ -293,7 +297,16 @@ class Runtime:
                     "No supported findings were returned; further approved evidence or clarification is required."
                 ]
             report.update(evidence_inventory(tasks))
-            report.update({"tasks": tasks, "issues": issues, "calls_used": len(tasks)})
+            report.update(
+                {
+                    "tasks": tasks,
+                    "issues": issues,
+                    "calls_used": len(tasks),
+                    "assessed_domains": [t["domain"] for t in tasks if t["result"] is not None],
+                    "full_team_assessed": len(tasks) == MAX_SPECIALIST_CALLS
+                    and all(t["result"] is not None for t in tasks),
+                }
+            )
             if has_findings:
                 state = (
                     "partial"

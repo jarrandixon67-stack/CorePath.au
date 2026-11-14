@@ -5,6 +5,7 @@ from uuid import UUID
 from life_profile.models import AnalyseRequest
 from persy.models import Message, PrivacyRequired, ProfileAnalysis, Reply
 from specialists.models import InvalidEvidence
+from specialists.registry import Domain
 
 
 class Runtime:
@@ -48,6 +49,11 @@ class Runtime:
                 self.provider.reply(
                     {
                         "member_message": message.message,
+                        "specialist_preferences": {
+                            "mode": message.specialist_mode,
+                            "max_specialists": message.max_specialists,
+                            "all_eleven_available": True,
+                        },
                         "communication_style": privacy["communication_style"],
                         "recent_conversation": history,
                         "approved_profile_context": context,
@@ -55,6 +61,16 @@ class Runtime:
                     }
                 )
             )
+            if reply.research_proposal:
+                # Trusted member controls override model-written preferences.
+                # The exact resulting proposal still requires existing approval.
+                proposal = reply.research_proposal.model_dump(mode="json")
+                proposal.update(
+                    specialist_mode=message.specialist_mode,
+                    max_specialist_calls=message.max_specialists,
+                    allowed_domains=list(Domain),
+                )
+                reply.research_proposal = type(reply.research_proposal).model_validate(proposal)
             if message.use_profile_context and self.services.profile(member, "context") != context:
                 raise InvalidEvidence("Approved context changed while replying")
             proposed = repo.finish(

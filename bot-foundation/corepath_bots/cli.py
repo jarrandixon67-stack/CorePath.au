@@ -20,6 +20,10 @@ def main():
     demo = commands.add_parser("demo", help="Run a synthetic offline all-eleven discussion")
     demo.add_argument("--output")
     discuss = commands.add_parser("discuss", help="Run a real model discussion with supplied approved sources")
+    discuss.add_argument("--mode", choices=["auto", "full"], default="auto")
+    discuss.add_argument("--max-specialists", type=int, choices=range(1, 12), default=11,
+                         help="Spending ceiling, not a quota; all eleven remain available")
+    discuss.add_argument("--peer-review", action="store_true", help="Request a second review round")
     discuss.add_argument("--question", required=True)
     discuss.add_argument("--sources", required=True, help="JSON array of approved public Source objects")
     discuss.add_argument("--approve-team-question", action="store_true")
@@ -39,13 +43,15 @@ def main():
     else:
         if args.command == "demo":
             report = Team(DemoProvider()).discuss("Demonstrate the all-eleven collaboration workflow.", demo_sources(),
-                                                  approved_for_all_specialists=True)
+                                                  approved_for_all_specialists=True, mode="full")
         else:
             if not args.approve_team_question:
                 parser.error("Review the exact question, then supply --approve-team-question")
             provider = OpenAIProvider(allow_model_processing=args.allow_model_processing)
             sources = [Source.model_validate(s) for s in json.loads(Path(args.sources).read_text())]
-            report = Team(provider).discuss(args.question, sources, approved_for_all_specialists=True)
+            report = Team(provider).discuss(args.question, sources, approved_for_all_specialists=True,
+                                            mode=args.mode, max_specialists=args.max_specialists,
+                                            review_round=args.peer_review)
         output = json.dumps(report, ensure_ascii=False, indent=2)
         if args.output:
             Path(args.output).write_text(output + "\n")

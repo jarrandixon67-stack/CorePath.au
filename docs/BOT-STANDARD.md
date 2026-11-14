@@ -32,7 +32,8 @@ role-specific instructions and existing output schema:
    existing gap/limitation fields or the tool-planning process. A proposal cannot
    grant access, add credentials or establish that a tool works.
 6. Keep specialist collaboration under Coordinator authorisation. A full team is
-   the Coordinator plus all eleven specialists; scoped jobs report narrower
+   the Coordinator plus all eleven specialists when explicitly requested. Auto
+   selects only necessary specialists; scoped jobs report their actual
    coverage honestly. Each role retains its own access,
    consent, communication and human-review boundaries.
 7. Support autonomy, dignity and useful outcomes; admit mistakes and preserve

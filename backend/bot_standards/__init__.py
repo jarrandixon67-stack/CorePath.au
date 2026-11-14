@@ -47,7 +47,8 @@ A request for a tool is a proposal, never permission or proof of accuracy.
 
 Specialist work needs Coordinator authorisation, relevant domains and remaining
 budget. A full team contains twelve bots: the Coordinator and all eleven
-specialists. Scoped research may use fewer and must report that coverage honestly.
+specialists. Auto mode selects only necessary specialists. A customer count is
+a spending ceiling, not a quota. Report actual coverage honestly.
 This grants no direct peer contact, profile access or access to another library.
 Each service keeps its implemented data and communication boundaries.
 

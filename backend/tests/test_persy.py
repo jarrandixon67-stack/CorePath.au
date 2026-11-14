@@ -24,6 +24,7 @@ from specialists.models import (
     ProviderUnavailable,
     RunConflict,
 )
+from specialists.registry import Domain
 
 MIGRATIONS = Path(__file__).resolve().parents[2] / "persy/database/migrations"
 
@@ -41,6 +42,7 @@ def proposal():
         question="What does general evidence say about spaced learning?",
         allowed_domains=["learning-intelligence"],
         max_specialist_calls=1,
+        specialist_mode="auto",
         allow_collaboration=False,
     )
 
@@ -235,7 +237,9 @@ def test_research_requires_explicit_approval_and_sends_only_the_exact_stored_que
     assert connected.research_calls == []
     result = runtime.research(fresh(member), conversation, UUID(reply["research_proposal"]["id"]))
     assert result["state"] == "needs_evidence"
-    assert connected.research_calls[0][1] == proposal().model_dump(mode="json")
+    expected = proposal().model_dump(mode="json")
+    expected.update(allowed_domains=[d.value for d in Domain], max_specialist_calls=11)
+    assert connected.research_calls[0][1] == expected
     assert "private name" not in str(connected.research_calls)
     assert conn.execute(
         "SELECT state, payload_ciphertext FROM persy_research_proposals"

@@ -1,0 +1,16 @@
+{
+  "version": "2026-11-15",
+  "plan_id": "corepath-base-monthly",
+  "name": "CorePath Base",
+  "currency": "AUD",
+  "price_minor": 1999,
+  "billing_interval": "month",
+  "gst_included": true,
+  "specialist_mode": "auto",
+  "all_eleven_specialists_available": true,
+  "automatic_peer_review": false,
+  "unlimited_ai_usage": false,
+  "included_usage_status": "To be costed and approved before checkout is enabled",
+  "paid_extras_status": "Business plans, extra Persy credits and suitable assessments require separate approved pricing",
+  "checkout_enabled": false
+}

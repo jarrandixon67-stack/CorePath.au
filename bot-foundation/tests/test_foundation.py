@@ -25,7 +25,7 @@ class TeamTests(unittest.TestCase):
     def test_full_team_reviews_then_coordinates_and_presents(self):
         provider = DemoProvider()
         report = Team(provider).discuss("How can we demonstrate the workflow?", demo_sources(),
-                                        approved_for_all_specialists=True)
+                                        approved_for_all_specialists=True, mode="full")
         self.assertEqual(report["state"], "completed")
         self.assertEqual(report["calls_attempted"], 24)
         self.assertEqual(len(report["contributions"]), 11)
@@ -69,7 +69,7 @@ class TeamTests(unittest.TestCase):
         provider = DemoProvider()
         with self.assertRaises(ValueError):
             Team(provider).discuss("Demonstrate duplicates", demo_sources() * 2,
-                                    approved_for_all_specialists=True)
+                                    approved_for_all_specialists=True, mode="full")
         self.assertFalse(provider.calls)
 
     def test_invalid_initial_output_yields_explicit_partial_report(self):
@@ -79,7 +79,7 @@ class TeamTests(unittest.TestCase):
                     raise ProviderError("Unavailable")
                 return super().generate(role_id, stage, context, contract)
         report = Team(Broken()).discuss("Demonstrate a partial team", demo_sources(),
-                                        approved_for_all_specialists=True)
+                                        approved_for_all_specialists=True, mode="full")
         self.assertEqual(report["state"], "partial")
         self.assertNotIn(Domain.PHYSICAL, report["contributions"])
         self.assertTrue(any("initial_unavailable" in issue for issue in report["issues"]))
@@ -92,7 +92,7 @@ class TeamTests(unittest.TestCase):
                 if stage == "peer_review" and role_id == Domain.NUTRITION:
                     result["claims"][0]["citations"][0]["quote"] = "An invented quotation"
                 return result
-        report = Team(Broken()).discuss("Demonstrate review failures", demo_sources(), approved_for_all_specialists=True)
+        report = Team(Broken()).discuss("Demonstrate review failures", demo_sources(), approved_for_all_specialists=True, mode="full")
         self.assertEqual(report["state"], "partial")
         self.assertEqual(report["contributions"][Domain.NUTRITION], report["initial_contributions"][Domain.NUTRITION])
 
@@ -103,7 +103,7 @@ class TeamTests(unittest.TestCase):
                 if role_id == "chief-of-staff":
                     result["conclusions"][0]["references"][0]["index"] = 2
                 return result
-        report = Team(Broken()).discuss("Demonstrate evidence validation", demo_sources(), approved_for_all_specialists=True)
+        report = Team(Broken()).discuss("Demonstrate evidence validation", demo_sources(), approved_for_all_specialists=True, mode="full")
         self.assertIsNone(report["synthesis"])
         self.assertIsNone(report["persy_draft"])
         self.assertEqual(report["state"], "partial")
@@ -115,7 +115,7 @@ class TeamTests(unittest.TestCase):
                 if role_id == "chief-of-staff":
                     result["conclusions"][0]["confidence"] = "high"
                 return result
-        report = Team(Inflated()).discuss("Demonstrate confidence bounds", demo_sources(), approved_for_all_specialists=True)
+        report = Team(Inflated()).discuss("Demonstrate confidence bounds", demo_sources(), approved_for_all_specialists=True, mode="full")
         self.assertEqual(report["synthesis"]["conclusions"][0]["confidence"], "low")
 
     def test_persy_cannot_drop_conclusions(self):
@@ -125,19 +125,19 @@ class TeamTests(unittest.TestCase):
                 if role_id == "persy":
                     result["conclusion_indexes"] = []
                 return result
-        report = Team(Drops()).discuss("Demonstrate presentation checks", demo_sources(), approved_for_all_specialists=True)
+        report = Team(Drops()).discuss("Demonstrate presentation checks", demo_sources(), approved_for_all_specialists=True, mode="full")
         self.assertIsNone(report["persy_draft"])
         self.assertEqual(report["state"], "partial")
 
     def test_budget_remains_bounded(self):
         report = Team(DemoProvider(), Limits(max_calls=13)).discuss(
-            "Demonstrate a smaller call budget", demo_sources(), approved_for_all_specialists=True)
+            "Demonstrate a smaller call budget", demo_sources(), approved_for_all_specialists=True, mode="full")
         self.assertEqual(report["calls_attempted"], 13)
         self.assertEqual(len(report["contributions"]), 11)
         self.assertEqual(report["state"], "partial")
 
     def test_empty_evidence_does_not_fabricate_findings(self):
-        report = Team(DemoProvider()).discuss("No supplied evidence is available", [], approved_for_all_specialists=True)
+        report = Team(DemoProvider()).discuss("No supplied evidence is available", [], approved_for_all_specialists=True, mode="full")
         self.assertFalse(report["contributions"])
         self.assertEqual(report["state"], "partial")
 
@@ -439,7 +439,7 @@ class BuilderTests(unittest.TestCase):
             self.assertEqual(result["state"], "draft_for_review")
             self.assertTrue(result["claim_entailment_requires_review"])
 
-    def test_business_research_goes_through_full_team_without_owner_facts(self):
+    def test_business_research_uses_auto_routing_without_owner_facts(self):
         class BusinessProvider(DemoProvider):
             def generate(self, role_id, stage, context, contract):
                 if stage == "business_plan":
@@ -456,7 +456,7 @@ class BuilderTests(unittest.TestCase):
                     model_processing_approved=True, research_question_approved=True)
         self.assertEqual(result["state"], "draft_for_review")
         specialist_calls = [c for c in provider.calls if c[0] in SPECIALIST_IDS]
-        self.assertEqual(len(specialist_calls), 22)
+        self.assertEqual(len(specialist_calls), 1)
         self.assertTrue(all(owner_text not in json.dumps(c[2]) for c in specialist_calls))
 
     def test_business_research_requires_approved_question(self):

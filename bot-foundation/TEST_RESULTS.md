@@ -63,3 +63,19 @@ paraphrase entailment, clinical suitability or production security. See
 
 The changes do not implement normal chat routing, shared peer review in the older
 transport, durable jobs, or production authorisation. Those limits remain explicit.
+
+## Auto routing and A$19.99 base offer — 15 November 2026
+
+- Foundation: 83 offline tests passed, including selective routing, 1/2/10/11
+  specialist ceilings, blocked over-ceiling dispatch, full-team compatibility,
+  invalid/duplicate routing, scoped feedback and visible unresolved peer needs.
+- Backend: 257 tests passed; 170 PostgreSQL-dependent tests skipped locally
+  because the databases are not configured. CI must run those integrations.
+- Backend lint and formatting passed. Canonical policy snapshots match. The
+  explicitly requested full-team synthetic CLI demo completed in 24 calls.
+- Auto is the default; all eleven remain available. Output ceilings are lower
+  for routing, specialist assessments and Persy presentation. No paid model
+  evaluation or measured live cost reduction is claimed.
+- The base offer records AUD 1,999 minor units/month, including GST, and disables
+  checkout. Included monthly usage, add-on pricing, metering and a revised
+  A$19.99 financial forecast remain required before commercial launch.

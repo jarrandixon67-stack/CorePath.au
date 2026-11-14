@@ -30,6 +30,7 @@ include = ["app*", "bot_standards*", "life_profile*", "specialists*", "coordinat
 [tool.setuptools.package-data]
 coordinator = ["evaluation_cases.json"]
 bot_standards = ["agreed-principles.json"]
+persy = ["membership.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

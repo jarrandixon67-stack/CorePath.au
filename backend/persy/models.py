@@ -1,7 +1,7 @@
 from typing import Literal
 from uuid import UUID
 
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from coordinator.limits import MAX_SPECIALIST_CALLS
 from coordinator.models import ResearchRequest
@@ -22,9 +22,18 @@ class PrivacyChange(Privacy):
 class Message(StrictModel):
     message: str = Field(min_length=1, max_length=4000)
     use_profile_context: bool = False
+    specialist_mode: Literal["auto", "full"] = "auto"
+    max_specialists: int = Field(default=11, ge=1, le=11, strict=True)
+
+    @model_validator(mode="after")
+    def full_team_ceiling(self):
+        if self.specialist_mode == "full" and self.max_specialists != 11:
+            raise ValueError("Full team needs an eleven-specialist ceiling")
+        return self
 
 
 class ResearchProposal(ResearchRequest):
+    specialist_mode: Literal["auto", "full"]
     max_specialist_calls: int = Field(ge=1, le=MAX_SPECIALIST_CALLS)
     allow_collaboration: bool
 

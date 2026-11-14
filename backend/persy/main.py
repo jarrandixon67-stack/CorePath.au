@@ -9,6 +9,7 @@ from psycopg import Error as DatabaseError
 from psycopg_pool import ConnectionPool, PoolTimeout
 
 from life_profile.models import Consent, Decision
+from persy.membership import base_membership
 from persy.models import Approval, Message, Missing, PrivacyChange, PrivacyRequired, ProfileAnalysis
 from persy.provider import OpenAIProvider
 from persy.repository import Repository
@@ -130,6 +131,11 @@ def live():
         "name": "Persy",
         "live_model_quality_verified": False,
     }
+
+
+@app.get("/v1/persy/membership")
+def membership():
+    return base_membership()
 
 
 @app.get("/v1/persy/privacy")

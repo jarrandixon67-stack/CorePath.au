@@ -162,7 +162,7 @@ def test_eleven_specialists_plus_coordinator_fit_the_full_team(coordinator_store
         evidence(conn, libraries[domain.value])
     provider, client = CoordinatorProvider(domains), LocalSpecialists(specialists)
     result = Runtime(repo, provider, client, settings).execute(
-        caller, request(list(Domain), max_specialist_calls=11)
+        caller, request(list(Domain), max_specialist_calls=11, specialist_mode="full")
     )
     assert result["state"] == "completed" and len(result["tasks"]) == 11
     assert client.calls == domains and result["call_budget"] == 11
@@ -194,7 +194,9 @@ def test_full_team_plan_cannot_omit_an_authorised_discipline(coordinator_store):
     provider = CoordinatorProvider([Domain.NUTRITION])
     client = LocalSpecialists(specialists)
     with pytest.raises(InvalidEvidence, match="all eleven"):
-        Runtime(repo, provider, client, settings).execute(caller, request(list(Domain)))
+        Runtime(repo, provider, client, settings).execute(
+            caller, request(list(Domain), specialist_mode="full")
+        )
     assert not client.calls
 
 

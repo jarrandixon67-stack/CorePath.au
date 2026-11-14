@@ -8,7 +8,7 @@ Corrections are proposed separately from main.
 
 Follow-up rule rewrite: the earlier nine-specialist policy is now removed from
 the older server, prompts, boundary tests and current documentation. The default
-and cap support eleven; fully authorised plans must include all eleven and Persy
+and cap support eleven; explicit full-team plans must include all eleven and Persy
 validates actual coverage. Principles have one canonical source and a tested
 packaged snapshot. The table below records the original review; other integration
 findings remain unresolved.

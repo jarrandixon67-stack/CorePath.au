@@ -14,14 +14,51 @@ Version 0.2.2 replaces conflicting common instructions with
 `corepath_bots/principles.json`, shared with the older backend through a generated
 packaged snapshot. The [agreed rules](../docs/AGREED-RULES.md) explain the changes.
 Tests require both implementations to use identical principles. The older
-coordinator now supports eleven initial assessments, rejects incomplete fully
-authorised plans and reports actual coverage. Shared peer review and automatic
+coordinator now supports eleven initial assessments, rejects incomplete explicit full-team
+plans and reports actual coverage. Shared peer review and automatic
 subscriber chat integration still need the replacement execution path.
 
 The existing `backend/` services retain their research contracts and are not
 automatically switched to this package. Their earlier nine-specialist rule has
 been replaced, while remaining transport/integration limits stay explicit. See
 [INTEGRATION.md](INTEGRATION.md) for a deliberate migration and known conflicts.
+
+## Current routing and base offer — 15 November 2026
+
+Version 0.3.0 replaces mandatory all-eleven consultation with **Auto**. The Chief
+of Staff selects necessary fields, then only those specialists assess the approved
+question. Peer review is off by default in Auto. Full-team mode is still available
+explicitly. A successful scoped answer is complete within its stated coverage;
+only eleven valid contributions can claim full-team coverage.
+
+`Team.discuss(..., approved_for_all_specialists=True)` now defaults to Auto.
+The approval makes the whole catalogue available; it does not request every bot.
+`mode="full"` preserves the old full-team/review behaviour. `max_specialists=1`
+through `11` sets an optional spending ceiling, not a target. If necessary domains
+exceed it, no specialist is dispatched and the result is `needs_selection_change`.
+A new Chief-of-Staff routing call is included in the call budget and deadline.
+There is no automatic fallback to all eleven after a routing failure. A newly
+requested but unconsulted peer is surfaced as an unresolved partial result.
+
+CLI: `discuss --mode auto --max-specialists 11` is the default;
+`--peer-review` opts into a second pass and `--mode full` requests all eleven.
+The offline `demo` deliberately exercises the legacy full-team path.
+
+The base offer is **A$19.99/month including GST**, recorded in
+`backend/persy/membership.json` and readable at `/v1/persy/membership`.
+No checkout or monthly-credit ledger is implemented. Included usage and extras
+still need actual costing; this must not be presented as unlimited AI access.
+Existing A$49/A$79 business forecasts are superseded pricing assumptions, not a
+validated forecast for this offer. There is no customer-facing gauge or live chat
+wiring in the existing static intelligence-centre frontend.
+
+Cost controls here reduce dispatch and output ceilings; they do not prove live
+cost, latency or answer quality. The foundation's stage ceilings are 700 output
+tokens for routing, 1,600 for a specialist pass, 900 for Persy's presentation,
+and 3,500 for other structured work. Invalid/truncated outputs fail closed and
+are not retried automatically. Compare reviewed outputs and actual billed usage
+before enabling paid access. All role permissions, source scopes, evidence checks
+and founder-only authority over 12 remain in place.
 
 ## What is built
 
