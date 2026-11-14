@@ -13,6 +13,7 @@ from coordinator.settings import Settings
 from persy.main import app
 from persy.models import Message
 from persy.runtime import Runtime as Persy
+from persy.settings import Settings as PersySettings
 from specialists.models import BudgetExceeded
 from specialists.registry import Domain
 
@@ -166,7 +167,9 @@ def test_explicit_full_team_needs_complete_permission_but_default_is_auto():
         )
 
 
-def test_base_offer_is_1999_aud_minor_units_without_unlimited_or_live_checkout_claims():
+def test_base_offer_is_1999_aud_minor_units_without_unlimited_or_live_checkout_claims(monkeypatch):
+    # Public offer metadata needs no private database or encryption credentials.
+    monkeypatch.setattr("persy.main.get_settings", lambda: PersySettings(database_url=None))
     with TestClient(app) as client:
         response = client.get("/v1/persy/membership")
     assert response.status_code == 200

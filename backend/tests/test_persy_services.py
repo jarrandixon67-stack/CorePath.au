@@ -29,6 +29,7 @@ from persy.runtime import Runtime
 from persy.services import Services, render_research
 from persy.settings import Settings, get_settings
 from specialists.models import BudgetExceeded, InvalidEvidence, ProviderUnavailable
+from specialists.registry import Domain
 
 persy_store = persy_fixture
 profiles = profile_fixture
@@ -474,7 +475,9 @@ def test_persy_approved_question_runs_through_real_coordinator_and_specialist(
     assert result["state"] == "completed" and result["name"] == "Persy"
     assert result["findings"][0]["citations"][0]["canonical_url"] == "https://example.org/evidence"
     assert result["findings"][0]["confidence"] == "low"
-    assert bridge.research_calls == [proposal().model_dump(mode="json")]
+    expected = proposal().model_dump(mode="json")
+    expected.update(allowed_domains=[d.value for d in Domain], max_specialist_calls=11)
+    assert bridge.research_calls == [expected]
     assert "Private personal marker" not in str(
         conn.execute("SELECT row_to_json(r) FROM coordinator_runs r").fetchall()
     )
