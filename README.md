@@ -77,3 +77,8 @@ The [partner bot](partners/README.md) provides bounded candidate discovery, evid
 ## Independent feedback oversight
 
 The [Feedback Bot](feedback/README.md) collects positive/negative CorePath and partner feedback, examines authorised review evidence and raises source-linked signals for human review. It uses separate encrypted storage and optional AI consent, and cannot change business ratings or access Life Profiles. This service is not deployed; no live review feed or customer feedback collection is enabled.
+
+
+## Agreed bot foundation (review build)
+
+The isolated [replacement bot foundation](bot-foundation/README.md) records the founder-agreed roles and implements an all-eleven discussion, routed peer review, coordinator feedback, Persy presentation, consent-controlled profile prototypes, public locations, partner limits and founder-controlled 12. It includes deterministic planning tools and reviewed-draft builders. It does not replace or deploy the existing services automatically. See its [handover](bot-foundation/HANDOVER.md), [integration plan](bot-foundation/INTEGRATION.md) and [executed checks](bot-foundation/TEST_RESULTS.md).

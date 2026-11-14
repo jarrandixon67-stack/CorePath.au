@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "corepath-bot-foundation"
+version = "0.2.0"
+description = "Reviewable CorePath bot foundation and bounded eleven-specialist collaboration"
+requires-python = ">=3.11"
+dependencies = ["pydantic>=2.4,<3"]
+
+[project.scripts]
+corepath-bots = "corepath_bots.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["corepath_bots*"]
+
+[tool.setuptools.package-data]
+corepath_bots = ["roles.json"]
