@@ -10,9 +10,17 @@ and coordinator-authorised drafting use separate stage-specific instructions;
 model instances are revalidated at hand-off, and specialist warnings cannot be
 silently dropped from Persy's draft.
 
-The existing `backend/` services still use their earlier contracts and are not
-automatically switched to this package. Their nine-specialist selection policy
-must not be combined with this package's all-eleven discussion policy. See
+Version 0.2.2 replaces conflicting common instructions with
+`corepath_bots/principles.json`, shared with the older backend through a generated
+packaged snapshot. The [agreed rules](../docs/AGREED-RULES.md) explain the changes.
+Tests require both implementations to use identical principles. The older
+coordinator now supports eleven initial assessments, rejects incomplete fully
+authorised plans and reports actual coverage. Shared peer review and automatic
+subscriber chat integration still need the replacement execution path.
+
+The existing `backend/` services retain their research contracts and are not
+automatically switched to this package. Their earlier nine-specialist rule has
+been replaced, while remaining transport/integration limits stay explicit. See
 [INTEGRATION.md](INTEGRATION.md) for a deliberate migration and known conflicts.
 
 ## What is built

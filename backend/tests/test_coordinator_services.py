@@ -27,21 +27,21 @@ from specialists.registry import Domain
 from specialists.runtime import grounded_result
 
 
-def test_tenth_specialist_is_rejected_by_request_configuration_and_persy_boundaries():
+def test_all_eleven_specialists_fit_request_configuration_and_persy_boundaries():
     payload = {
         "question": "Research the relevant evidence",
         "allowed_domains": list(Domain),
-        "max_specialist_calls": 9,
+        "max_specialist_calls": 11,
         "allow_collaboration": True,
     }
     assert len(ResearchRequest.model_validate(payload).allowed_domains) == 11
-    assert ResearchProposal.model_validate(payload).max_specialist_calls == 9
-    payload["max_specialist_calls"] = 10
+    assert ResearchProposal.model_validate(payload).max_specialist_calls == 11
+    payload["max_specialist_calls"] = 12
     for contract in (ResearchRequest, ResearchProposal):
         with pytest.raises(ValidationError):
             contract.model_validate(payload)
     with pytest.raises(ValidationError):
-        Settings(max_specialist_calls=10)
+        Settings(max_specialist_calls=12)
     with pytest.raises(InvalidEvidence, match="task count"):
         render_research(
             {
@@ -49,14 +49,14 @@ def test_tenth_specialist_is_rejected_by_request_configuration_and_persy_boundar
                 "review_required": True,
                 "life_profile_access": False,
                 "state": "completed",
-                "tasks": [{}] * 10,
+                "tasks": [{}] * 12,
             }
         )
 
 
-def test_followup_cannot_expand_an_existing_nine_specialist_team():
+def test_followup_cannot_repeat_a_member_of_the_complete_eleven_specialist_team():
     with pytest.raises(InvalidEvidence):
-        validate_assignments([assignment(list(Domain)[9])], list(Domain), 2, used=list(Domain)[:9])
+        validate_assignments([assignment(list(Domain)[9])], list(Domain), 2, used=list(Domain))
 
 
 def keys():

@@ -47,3 +47,19 @@ not executed in this environment and the old services were not modified.
 Structural tests do not establish live reasoning quality, source truth,
 paraphrase entailment, clinical suitability or production security. See
 `INTEGRATION.md` for the remaining service and evaluation work.
+
+## Follow-up rule rewrite (0.2.2)
+
+- Foundation suite: 72 tests passed, including cross-runtime policy parity and
+  eleven-specialist request boundaries.
+- Older backend suite: 248 tests passed locally; 170 database-dependent cases
+  were skipped because no disposable PostgreSQL database was configured.
+- Changed backend files passed lint/format checks; shared-policy snapshot check
+  passed and the 24-call synthetic team demo completed.
+- Updated integration tests cover all eleven real scoped runtimes in one team,
+  rejection of an incomplete fully authorised plan, server-side call limits and
+  Persy's rejection of false full-team coverage. PostgreSQL execution of these
+  tests is delegated to the repository CI, not claimed as a local pass.
+
+The changes do not implement normal chat routing, shared peer review in the older
+transport, durable jobs, or production authorisation. Those limits remain explicit.

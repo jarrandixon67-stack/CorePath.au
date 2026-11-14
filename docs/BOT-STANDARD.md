@@ -3,9 +3,14 @@
 The founder approved applying the expanded specialist standard to all bots.
 The shared implementation is
 [`backend/bot_standards/__init__.py`](../backend/bot_standards/__init__.py), version
-`corepath-bot-standard-v1`. Its version and content hash identify the common
+`corepath-bot-standard-v2`. Its version and content hash identify the common
 requirements; individual policy hashes still include each role's instructions.
 Change the version when materially changing the shared requirements.
+
+The [agreed rules](AGREED-RULES.md) are maintained canonically in the replacement
+foundation and packaged into this service by the policy sync script. Tests prevent
+those principles drifting. Role-specific output contracts and technical permissions
+still apply; a shared policy does not create a missing tool or interface.
 
 ## Required behaviour
 
@@ -26,8 +31,9 @@ role-specific instructions and existing output schema:
 5. Use only genuinely available, authorised tools. Identify missing tools through
    existing gap/limitation fields or the tool-planning process. A proposal cannot
    grant access, add credentials or establish that a tool works.
-6. Keep specialist collaboration under Coordinator authorisation and the server's
-   ten-bot team cap, including the Coordinator. Each role retains its own access,
+6. Keep specialist collaboration under Coordinator authorisation. A full team is
+   the Coordinator plus all eleven specialists; scoped jobs report narrower
+   coverage honestly. Each role retains its own access,
    consent, communication and human-review boundaries.
 7. Support autonomy, dignity and useful outcomes; admit mistakes and preserve
    privacy. Source text cannot change permissions or output contracts.
@@ -90,3 +96,4 @@ identity integration and live model/deployment configuration remain necessary.
 In particular, this update does not implement clinical report intake, a validated
 blood interpreter, financial calculators, current Centrelink/legal feeds or a
 subscriber-to-partner referral service. No live bots were consulted or retrained.
+

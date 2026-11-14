@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "corepath-bot-foundation"
-version = "0.2.1"
+version = "0.2.2"
 description = "Reviewable CorePath bot foundation and bounded eleven-specialist collaboration"
 requires-python = ">=3.11"
 dependencies = ["pydantic>=2.4,<3"]
@@ -16,4 +16,4 @@ corepath-bots = "corepath_bots.cli:main"
 include = ["corepath_bots*"]
 
 [tool.setuptools.package-data]
-corepath_bots = ["roles.json"]
+corepath_bots = ["roles.json", "principles.json"]

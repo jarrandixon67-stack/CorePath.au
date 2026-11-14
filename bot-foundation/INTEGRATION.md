@@ -7,10 +7,11 @@ deployment files are changed.
 
 ## One policy per execution path
 
-The current backend chooses up to nine specialists with optional unused-domain
-follow-up. This package always attempts all eleven, then optionally reviews their
-initial briefs. Do not concatenate these policies or quietly change the old
-database contract. Version the execution path and switch one path deliberately
+The earlier nine-specialist rule has been replaced in the backend. It supports
+eleven initial assessments and rejects an incomplete fully authorised plan, but
+retains optional unused-domain follow-up. This package attempts all eleven and
+reviews their initial briefs. The common principles are canonical and shared;
+the two discussion transports remain distinct. Switch a versioned path deliberately
 after evaluating it. `roles.json` is the single source of the new role content;
 `registry.instructions()` assembles shared, specialist and role instructions.
 Generated prompt exports are inspection copies, not editable authorities.
@@ -49,7 +50,8 @@ Generated prompt exports are inspection copies, not editable authorities.
 
 ## Existing conflicts that still need integration fixes
 
-The earlier review identified mismatched Persy/coordinator timeouts and work
+The earlier review's nine-specialist policy conflict is corrected. It also
+identified mismatched Persy/coordinator timeouts and work
 leases, coordinator run budgets versus specialist execution budgets, knowledge
 API authorisation enforcement, unbounded profile context versus Persy's limit,
 feedback database role permissions, contributor thresholds above snapshot sizes,

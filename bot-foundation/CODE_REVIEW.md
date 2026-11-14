@@ -6,6 +6,13 @@ commit `29d8a10019d1f1e50a271fc737232576db94c177`). The original 45 tests and bo
 repository CI jobs passed. Boundary checks nevertheless found real defects.
 Corrections are proposed separately from main.
 
+Follow-up rule rewrite: the earlier nine-specialist policy is now removed from
+the older server, prompts, boundary tests and current documentation. The default
+and cap support eleven; fully authorised plans must include all eleven and Persy
+validates actual coverage. Principles have one canonical source and a tested
+packaged snapshot. The table below records the original review; other integration
+findings remain unresolved.
+
 ## Foundation findings corrected
 
 | Severity | Finding and concrete effect | Correction and verification |
@@ -33,7 +40,7 @@ HTTP/database path, so its changes do not silently fix these issues.
 
 | Severity | Existing code | Effect / required work |
 |---|---|---|
-| High | `backend/coordinator/limits.py`, `coordinator/policy.py`, `bot_standards/__init__.py` | Older services select at most nine specialists; the foundation attempts all eleven. Migrate a versioned path rather than combining policies or assuming a merged package activates it. |
+| Resolved policy conflict | `backend/coordinator/limits.py`, `coordinator/policy.py`, `bot_standards/__init__.py` | The follow-up rewrite removes the nine-specialist ceiling, shares canonical principles and enforces eleven initial assignments for fully authorised research. Automatic subscriber routing and the older transport's peer-review round remain integration work. |
 | High | `backend/persy/settings.py:service_timeout_seconds`, `coordinator/settings.py:max_duration_seconds`, `persy/runtime.py:research` | Persy defaults to 60 seconds; coordinator work may continue for 180. Upstream failure can coexist with downstream work. Add durable status, cancellation and reconciliation. |
 | High | `backend/app/main.py`, `backend/app/security.py` | Knowledge routes use a shared internal token; the identity/library permission engine is not enforced there. Integrate endpoint-level authorisation before subscriber exposure. |
 | Medium | `backend/life_profile/repository.py:context`, `backend/persy/services.py:ApprovedContext` | Old context is unbounded; Persy rejects more than fifty items. Larger profiles can break personalisation. Add bounded relevant retrieval and contract tests. |

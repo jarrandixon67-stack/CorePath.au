@@ -352,6 +352,12 @@ def test_research_cards_rebuild_sources_and_reject_fabricated_references():
     rendered = render_research(payload)
     assert rendered["findings"][0]["confidence"] == "low"
     assert rendered["findings"][0]["citations"] == finding["citations"]
+    assert rendered["assessed_domains"] == ["nutrition"]
+    assert rendered["full_team_assessed"] is False
+    payload["full_team_assessed"] = True
+    with pytest.raises(InvalidEvidence, match="full-team"):
+        render_research(payload)
+    payload["full_team_assessed"] = False
     payload["conclusions"][0]["evidence"][0]["task_id"] = str(uuid4())
     with pytest.raises(InvalidEvidence):
         render_research(payload)
