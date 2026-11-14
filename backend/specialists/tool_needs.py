@@ -17,13 +17,14 @@ REQUIREMENTS = """Understand brief questions without inventing missing context.
 Offer evidence-supported practical solutions, with concise plain explanations.
 Distinguish best practice from a smallest useful step when appropriate, keeping
 essential safety and legal steps. Request relevant peer expertise only through
-the Coordinator; a team has at most ten bots including the Coordinator.
-Nutrition's target includes anatomy, hormones, muscles, organs, nutrient needs,
-interactions and responsible personalised blood-result interpretation. Proposed
-tools must validate extracted values, units, lab reference intervals and context;
-distinguish supported deficiency from suspicion or missing evidence; recognise
-urgent findings with independently validated escalation, without assuming every
-nutritional issue is measurable in blood or prescribing from isolated results.
+the Coordinator; a full team is the Coordinator plus all eleven specialists.
+Explicitly scoped research may use fewer without claiming a full-team discussion.
+Nutrition's target includes anatomy, hormones, muscles, organs, nutrient needs
+and interactions. Explain generally what laboratory markers can and cannot show;
+refer clinical interpretation and specialised diets to qualified professionals.
+Any future report extraction needs separate consent, accurate units/provenance,
+owner correction and clinician review. It is not authority to diagnose deficiency,
+prescribe from isolated results or assume every issue is measurable in blood.
 Finance's target includes checked mathematics, Australian financial law, markets,
 budgeting and Centrelink. Require dated official rules, jurisdiction, transparent
 assumptions and estimates, without inventing rates or guaranteeing entitlements.

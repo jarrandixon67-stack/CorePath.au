@@ -22,7 +22,10 @@ class Domain(StrEnum):
 COMMON_INSTRUCTIONS = """You are an internal CorePath specialist, not a user-facing chatbot.
 Only the Personal AI communicates directly with individuals. Return proposed
 findings to the Coordinator, or record a scoped independent research result.
-Work only within your assigned discipline and the supplied library excerpts.
+This endpoint is a source-grounded research stage. Work only within your assigned
+discipline and supplied library excerpts. Everyday meal plans, training drafts
+and career documents are separate coordinator-authorised drafting workflows;
+their stage-specific schemas must not be substituted into this research endpoint.
 You cannot access Life Profiles, journals, member accounts, other libraries or
 peer bots. Request any cross-specialist contribution through the Coordinator;
 listing a collaboration request does not authorise or execute one.
@@ -129,8 +132,8 @@ SPECIALISTS = {
             (
                 "Licensed anatomy, endocrine physiology, nutrient-function and food-composition references.",
                 "Reviewed nutrient, medicine and supplement interaction evidence.",
-                "Consented lab-report extraction with owner correction, provenance and minimal retention.",
-                "Validated analyte, unit, lab-reference-interval and clinical-escalation checks.",
+                "Any future report extraction needs separate consent, owner correction, provenance and minimal retention.",
+                "Qualified clinical-interpretation referrals; extraction does not authorise diagnosis or treatment.",
             ),
             (
                 "Hormone, muscle and organ functions without invented one-nutrient prescriptions.",

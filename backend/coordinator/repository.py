@@ -57,7 +57,7 @@ class Repository:
         )
         if not row:
             raise RunConflict
-        # Historical runs may have been created before the ten-bot team limit.
+        # Enforce the current cap even for historical or unvalidated callers.
         row["max_calls"] = min(row["max_calls"], MAX_SPECIALIST_CALLS)
         return row
 

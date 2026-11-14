@@ -1,8 +1,9 @@
 """Founder-controlled synthesis of reviewed, explicitly public general findings."""
 
 import json
+import hashlib
 
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from .contracts import Claim, Domain, Model, Source, TwelveReport
 from .provider import Provider
@@ -17,6 +18,12 @@ class PublicFinding(Model):
     claim: Claim
     sources: list[Source] = Field(min_length=1, max_length=4)
 
+    @model_validator(mode="after")
+    def distinct_sources(self):
+        if len({source.id for source in self.sources}) != len(self.sources):
+            raise ValueError("Reviewed finding source IDs must be distinct")
+        return self
+
 
 class KnowledgeReview:
     def __init__(self, store: Store):
@@ -30,12 +37,12 @@ class KnowledgeReview:
         validate_contribution(finding.domain, Contribution(
             relevant=True, summary="Reviewed general finding", claims=[finding.claim],
             questions=[], gaps=[], peer_requests=[], referral_reason=None), finding.sources)
-        with self.store.db as db:
+        with self.store.transaction() as db:
             db.execute("INSERT INTO findings VALUES(?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET domain=excluded.domain,payload=excluded.payload,reviewed_by=excluded.reviewed_by,reviewed_at=excluded.reviewed_at",
                        (finding.id, finding.domain.value, finding.model_dump_json(), reviewer, now()))
 
     def retract(self, finding_id):
-        with self.store.db as db:
+        with self.store.transaction() as db:
             db.execute("DELETE FROM findings WHERE id=?", (finding_id,))
 
 
@@ -51,12 +58,12 @@ class Twelve:
 
     def enable(self, actor):
         self._founder(actor)
-        with self.store.db as db:
+        with self.store.transaction() as db:
             db.execute("UPDATE twelve_state SET enabled=1,generation=generation+1 WHERE singleton=1")
 
     def shutdown(self, actor):
         self._founder(actor)
-        with self.store.db as db:
+        with self.store.transaction() as db:
             db.execute("UPDATE twelve_state SET enabled=0,generation=generation+1 WHERE singleton=1")
 
     def status(self, actor):
@@ -96,26 +103,40 @@ class Twelve:
         for idea in report.ideas:
             if not set(idea.evidence_ids) <= ids or len(set(idea.evidence_ids)) != len(idea.evidence_ids):
                 raise InvalidEvidence("12 cited missing or duplicate reviewed findings")
-        # Retraction during a request invalidates the result before saving.
-        current = {r["id"]: r["payload"] for r in self.store.db.execute("SELECT id,payload FROM findings")}
-        if any(current.get(r["id"]) != r["payload"] for r in rows):
-            raise InvalidEvidence("Reviewed evidence was retracted or changed during processing")
         item_id = identifier()
-        with self.store.db as db:
+        # Lock before rechecking both shutdown and sources, not on the later
+        # INSERT; otherwise another connection could revoke either in between.
+        with self.store.transaction() as db:
             self._active(generation)
+            current = {r["id"]: r["payload"] for r in db.execute("SELECT id,payload FROM findings")}
+            if any(current.get(r["id"]) != r["payload"] for r in rows):
+                raise InvalidEvidence("Reviewed evidence was retracted or changed during processing")
             db.execute("INSERT INTO twelve_reports VALUES(?,?,?,?)", (item_id, generation, report.model_dump_json(), now()))
+            db.executemany("INSERT INTO twelve_report_sources VALUES(?,?,?)",
+                           [(item_id, r["id"], hashlib.sha256(r["payload"].encode()).hexdigest()) for r in rows])
         return {"state": "proposed", "report_id": item_id,
                 "audience": "founder_only", "report": report.model_dump(mode="json")}
 
     def reports(self, actor):
         self._founder(actor)
-        return [{"id": r["id"], "created_at": r["created_at"], "report": json.loads(r["payload"])}
-                for r in self.store.db.execute("SELECT id,payload,created_at FROM twelve_reports ORDER BY created_at DESC")]
+        result = []
+        with self.store.transaction() as db:
+            for row in db.execute("SELECT id,payload,created_at FROM twelve_reports ORDER BY created_at DESC"):
+                sources = db.execute("""SELECT s.fingerprint,f.payload FROM twelve_report_sources s
+                           LEFT JOIN findings f ON f.id=s.finding_id WHERE s.report_id=?""", (row["id"],)).fetchall()
+                current = bool(sources) and all(
+                    s["payload"] is not None and hashlib.sha256(s["payload"].encode()).hexdigest() == s["fingerprint"]
+                    for s in sources)
+                result.append({"id": row["id"], "created_at": row["created_at"],
+                               "evidence_state": "current" if current else "needs_review",
+                               "report": json.loads(row["payload"])})
+        return result
 
     def erase_local_records(self, actor):
         """Disable 12 and logically delete its reports; not physical/backup erasure."""
-        self.shutdown(actor)
-        with self.store.db as db:
+        self._founder(actor)
+        with self.store.transaction() as db:
+            db.execute("UPDATE twelve_state SET enabled=0,generation=generation+1 WHERE singleton=1")
             db.execute("DELETE FROM twelve_reports")
         return {"disabled": True, "local_reports_deleted": True,
                 "scope": "Logical deletion in this local database only; reviewed specialist knowledge is retained."}

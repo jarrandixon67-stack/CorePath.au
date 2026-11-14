@@ -80,15 +80,15 @@ This contract must be implemented and deployed through trusted machine identity 
 
 ## Work limits and recovery
 
-Requests default to four specialist calls per run. The default server capacity is
-nine specialist calls; a request must explicitly select a larger budget to use
-it. The hard limit is ten bots total: one Coordinator and up to nine distinct
-specialists, counting both initial and authorised follow-up assignments. All
-eleven disciplines remain available for selection. Persy is outside this internal
-team and still obtains member approval of the exact question and budget. Existing
-deployments with a capacity of four remain capped at four until reconfigured;
-old configurations above nine must be reduced. No database migration is required;
-historical run records are preserved, with the current cap applied at dispatch.
+Requests and server capacity default to eleven specialist calls. A full team is
+one Coordinator plus all eleven specialists. If all eleven domains and the full
+budget are authorised, the initial plan must cover all eleven or is rejected
+before dispatch. Explicitly scoped jobs may use fewer; their permissions are
+never broadened automatically. Reports expose actual coverage and distinguish
+initial assessment from a shared peer-review round, which this older transport
+does not execute. Persy still obtains approval of the exact question and scope.
+Existing lower-capacity deployments stay capped until deliberately reconfigured.
+No schema migration is needed; the existing database permits eleven calls.
 
 Other defaults are twenty starts per rolling day for each Personal AI service
 identity, one concurrent run, 3,000 output tokens per Coordinator model call and
@@ -115,3 +115,4 @@ python -m coordinator.evaluate --live --output routing-evaluation.json
 ```
 
 Without `--live`, the command validates fixture contracts only and reports `live_model_evaluated: false`. A live run requires configured model/key settings and an output path. It reports actual plans and whether each matches the labelled decision and minimal domain set. Even a perfect routing score does not certify overall bot quality, factuality, clinical safety, prompt-injection resistance or synthesis quality. Real model and end-to-end evaluations, licensed source ingestion, human evidence review, Personal AI integration, trusted gateways, hosting and operational monitoring remain required before launch. No live model evaluation or deployed Coordinator is claimed by this repository implementation.
+

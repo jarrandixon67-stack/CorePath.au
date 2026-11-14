@@ -11,7 +11,7 @@ from specialists.registry import Domain
 class ResearchRequest(StrictModel):
     question: str = Field(min_length=5, max_length=2000)
     allowed_domains: list[Domain] = Field(min_length=1, max_length=11)
-    max_specialist_calls: int = Field(default=4, ge=1, le=MAX_SPECIALIST_CALLS)
+    max_specialist_calls: int = Field(default=MAX_SPECIALIST_CALLS, ge=1, le=MAX_SPECIALIST_CALLS)
     allow_collaboration: bool = False
 
     @model_validator(mode="after")

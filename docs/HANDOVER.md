@@ -17,19 +17,17 @@ The immediate build is the shared knowledge foundation for eleven specialist dom
 
 ## Current continuation
 
-The founder expanded the specialist requirements: understand brief descriptions,
-give concise practical solutions, collaborate in teams of at most ten bots
-including the Coordinator, and distinguish best practice from a minimum useful
-action when appropriate. [The capability specification](SPECIALIST-CAPABILITIES.md)
-records Nutrition's anatomy/hormone/nutrient and blood-result targets, Finance's
-mathematics/Australian-law/markets/Centrelink targets, proposed tools, independent
-evaluation requirements and the approved future subscriber-referral flow.
-The first implementation expands the two discipline briefs, enforces a nine-
-specialist ceiling at server dispatch and Persy boundaries, and adds an explicit
-operator tool-needs consultation command. Reports never grant tools or certify
-expertise. Clinical intake, validated blood interpretation, financial calculators,
-current official rules and subscriber-to-partner matching remain unimplemented.
-Do not describe prepared consultation briefs as replies from live bots.
+The founder's latest [agreed rules](AGREED-RULES.md) replace the earlier
+nine-specialist ceiling: full discussions include all eleven specialists and the
+Chief of Staff. A shared canonical policy now governs the older services and
+replacement foundation. The older research path can dispatch all eleven and
+rejects incomplete full-team plans; the replacement foundation also implements
+bounded peer review. Normal chat integration remains pending. Explicitly scoped
+research keeps its narrower permissions and reports coverage honestly.
+
+[The capability specification](SPECIALIST-CAPABILITIES.md) records discipline
+targets, proposed tools, independent evaluation and referral requirements. These
+do not establish expertise, grant tools or make a live service operational.
 
 The founder then approved applying this standard across all bots. The
 [shared implementation](BOT-STANDARD.md) is included in the actual model
@@ -115,3 +113,4 @@ Natural or under-researched approaches must not be rejected solely for that reas
 The separate [Feedback Bot](../feedback/README.md) covers positive and negative feedback about both CorePath and partner businesses, permitted review analysis and human concern review. It has no authority to change ratings, qualify businesses, send recruitment mail or access Life Profiles. Private AI analysis is opt-in; source withdrawal retracts derived signals. Concerns remain unverified until a person investigates.
 
 These new services are code implementations with synthetic tests, not deployed services or an active worldwide campaign. No real business was rated or emailed. Live use requires the separate service/database/gateway setup, verified sender/recipient eligibility and an actual approved country/sector policy. The journalling introduction is published separately in the existing Forest & ivory Sites project.
+

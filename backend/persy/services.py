@@ -130,6 +130,9 @@ def render_research(payload):
         raise InvalidEvidence("Coordinator state and findings disagree")
     if payload["state"] == "needs_clarification" and tasks:
         raise InvalidEvidence("Coordinator dispatched before clarification")
+    full_team_assessed = len(tasks) == MAX_SPECIALIST_CALLS and all(task.result for task in tasks)
+    if "full_team_assessed" in payload and payload["full_team_assessed"] is not full_team_assessed:
+        raise InvalidEvidence("Coordinator full-team claim did not match its actual tasks")
     options = []
     for item in payload.get("options", []):
         if (
@@ -170,6 +173,9 @@ def render_research(payload):
         "disagreements": list(dict.fromkeys(conflicts)),
         "clarifying_questions": questions,
         "review_required": True,
+        "assessed_domains": [task.domain.value for task in tasks if task.result],
+        "full_team_assessed": full_team_assessed,
+        "peer_review_round_executed": False,
         "evidence_note": "Citations establish traceability, not truth or applicability. Confidence is an uncalibrated model judgement.",
     }
 

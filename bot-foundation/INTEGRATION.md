@@ -7,10 +7,11 @@ deployment files are changed.
 
 ## One policy per execution path
 
-The current backend chooses up to nine specialists with optional unused-domain
-follow-up. This package always attempts all eleven, then optionally reviews their
-initial briefs. Do not concatenate these policies or quietly change the old
-database contract. Version the execution path and switch one path deliberately
+The earlier nine-specialist rule has been replaced in the backend. It supports
+eleven initial assessments and rejects an incomplete fully authorised plan, but
+retains optional unused-domain follow-up. This package attempts all eleven and
+reviews their initial briefs. The common principles are canonical and shared;
+the two discussion transports remain distinct. Switch a versioned path deliberately
 after evaluating it. `roles.json` is the single source of the new role content;
 `registry.instructions()` assembles shared, specialist and role instructions.
 Generated prompt exports are inspection copies, not editable authorities.
@@ -49,7 +50,8 @@ Generated prompt exports are inspection copies, not editable authorities.
 
 ## Existing conflicts that still need integration fixes
 
-The earlier review identified mismatched Persy/coordinator timeouts and work
+The earlier review's nine-specialist policy conflict is corrected. It also
+identified mismatched Persy/coordinator timeouts and work
 leases, coordinator run budgets versus specialist execution budgets, knowledge
 API authorisation enforcement, unbounded profile context versus Persy's limit,
 feedback database role permissions, contributor thresholds above snapshot sizes,
@@ -65,9 +67,14 @@ tests during service integration.
 - Jobs need durable idempotency and retries with remaining-budget checks. The
   local reminder helper takes a previously delivered date; delivery systems must
   persist and atomically claim that key before sending. It is not a durable queue.
-- The local SQL store assumes a trusted single application process. Multi-worker
-  concurrency, transactional consent race protection, encrypted persistence and
-  per-service database credentials need production-specific implementation.
+- The local SQL store uses explicit short write transactions for consent
+  decisions and 12's result acceptance, with no network requests under those
+  locks. Production multi-worker jobs, encryption, database isolation, durable
+  cancellation and per-service credentials still need integration and evaluation.
+- Profile excerpts must carry reviewed category/sensitivity metadata. Do not
+  forward whole raw conversations and rely on output filtering after a model
+  has received them. Treat this as an intentional input-contract change and
+  authenticate the coordinator before constructing draft builders.
 - A model can still make an unsupported paraphrase despite a matching source
   quote. Keep independent evidence and response review; structural checks are
   necessary but insufficient.

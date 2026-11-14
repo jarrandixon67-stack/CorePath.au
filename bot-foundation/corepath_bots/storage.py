@@ -7,6 +7,7 @@ must never populate owner/caller IDs or grants.
 
 import json
 import sqlite3
+from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
 from uuid import uuid4
@@ -30,6 +31,10 @@ class Store:
             kind TEXT NOT NULL, sensitive INTEGER NOT NULL, evidence TEXT NOT NULL,
             state TEXT NOT NULL, share_persy INTEGER NOT NULL DEFAULT 0,
             share_coordinator INTEGER NOT NULL DEFAULT 0, updated_at TEXT NOT NULL);
+          CREATE TABLE IF NOT EXISTS profile_revision (
+            singleton INTEGER PRIMARY KEY CHECK(singleton=1), next_revision INTEGER NOT NULL);
+          INSERT OR IGNORE INTO profile_revision
+            SELECT 1, coalesce(max(revision),0)+1 FROM consent;
           CREATE TABLE IF NOT EXISTS locations (
             id TEXT PRIMARY KEY, payload TEXT NOT NULL);
           CREATE TABLE IF NOT EXISTS findings (
@@ -42,7 +47,29 @@ class Store:
           CREATE TABLE IF NOT EXISTS twelve_reports (
             id TEXT PRIMARY KEY, generation INTEGER NOT NULL, payload TEXT NOT NULL,
             created_at TEXT NOT NULL);
+          CREATE TABLE IF NOT EXISTS twelve_report_sources (
+            report_id TEXT NOT NULL REFERENCES twelve_reports(id) ON DELETE CASCADE,
+            finding_id TEXT NOT NULL, fingerprint TEXT NOT NULL,
+            PRIMARY KEY(report_id,finding_id));
         """)
+
+    @contextmanager
+    def transaction(self):
+        """Lock before reading permissions and hold the lock through acceptance.
+
+        A connection context alone does not start a SQLite transaction until its
+        first write. Explicit BEGIN closes the check-then-write race across stores.
+        Keep model/network calls outside this short critical section.
+        """
+        if self.db.in_transaction:
+            raise RuntimeError("Use standalone service calls, not nested transactions")
+        self.db.execute("BEGIN IMMEDIATE")
+        try:
+            yield self.db
+            self.db.commit()
+        except BaseException:
+            self.db.rollback()
+            raise
 
     def close(self):
         self.db.close()

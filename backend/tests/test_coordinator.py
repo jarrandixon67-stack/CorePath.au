@@ -155,36 +155,47 @@ def test_coordinator_executes_each_of_the_eleven_real_scoped_runtimes(coordinato
     assert conn.execute("SELECT count(*) FROM research_findings").fetchone()[0] == 0
 
 
-def test_nine_specialists_plus_coordinator_fit_the_ten_bot_team(coordinator_store):
+def test_eleven_specialists_plus_coordinator_fit_the_full_team(coordinator_store):
     repo, specialists, libraries, conn, caller, settings = coordinator_store
-    domains = list(Domain)[:9]
+    domains = list(Domain)
     for domain in domains:
         evidence(conn, libraries[domain.value])
     provider, client = CoordinatorProvider(domains), LocalSpecialists(specialists)
     result = Runtime(repo, provider, client, settings).execute(
-        caller, request(list(Domain), max_specialist_calls=9)
+        caller, request(list(Domain), max_specialist_calls=11)
     )
-    assert result["state"] == "completed" and len(result["tasks"]) == 9
-    assert client.calls == domains and result["call_budget"] == 9
-    assert result["team_bot_limit"] == 10
+    assert result["state"] == "completed" and len(result["tasks"]) == 11
+    assert client.calls == domains and result["call_budget"] == 11
+    assert result["team_bot_limit"] == 12
     assert result["team_count_includes"] == "coordinator_and_dispatched_specialists"
+    assert result["full_team_requested"] and result["full_team_assessed"]
+    assert result["peer_review_round_executed"] is False
 
 
 def test_server_reservation_caps_legacy_or_unvalidated_budgets(coordinator_store):
     repo, _, _, conn, caller, settings = coordinator_store
     # Defence in depth even when an alternate caller bypasses Pydantic validation.
-    request_value = request(list(Domain)).model_copy(update={"max_specialist_calls": 11})
-    settings = settings.model_copy(update={"max_specialist_calls": 11})
+    request_value = request(list(Domain)).model_copy(update={"max_specialist_calls": 100})
+    settings = settings.model_copy(update={"max_specialist_calls": 100})
     run_id = repo.start(caller, request_value, settings)
-    assert repo.read(caller, run_id, settings)["max_calls"] == 9
+    assert repo.read(caller, run_id, settings)["max_calls"] == 11
     # Preserve old stored history; enforce today's cap at the dispatch boundary.
     conn.execute("UPDATE coordinator_runs SET max_calls = 11 WHERE id = %s", (run_id,))
     conn.commit()
-    for domain in list(Domain)[:9]:
+    for domain in list(Domain):
         repo.reserve(caller, run_id, assignment(domain), "initial", settings)
     with pytest.raises(BudgetExceeded):
         repo.reserve(caller, run_id, assignment(list(Domain)[9]), "initial", settings)
-    assert repo.read(caller, run_id, settings)["calls_used"] == 9
+    assert repo.read(caller, run_id, settings)["calls_used"] == 11
+
+
+def test_full_team_plan_cannot_omit_an_authorised_discipline(coordinator_store):
+    repo, specialists, _, _, caller, settings = coordinator_store
+    provider = CoordinatorProvider([Domain.NUTRITION])
+    client = LocalSpecialists(specialists)
+    with pytest.raises(InvalidEvidence, match="all eleven"):
+        Runtime(repo, provider, client, settings).execute(caller, request(list(Domain)))
+    assert not client.calls
 
 
 def test_ambiguity_requests_clarification_before_dispatch(coordinator_store):

@@ -19,11 +19,10 @@ Role-specific permissions and output contracts remain in force.
   practical next steps. Offer more detail when the individual wants it.
 - Distinguish evidence-supported best practice from a smallest useful action
   when appropriate. State trade-offs; retain essential safety and legal steps.
-- Collaborate through the Coordinator when another discipline would help.
-  Interpret the requested maximum as **ten bots total: the Coordinator and up
-  to nine distinct specialists**, including the initial specialist. All eleven
-  disciplines remain available for selection. Persy presents the result outside
-  that internal research team. Do not assemble a large team for a simple issue.
+- A full discussion includes **all eleven specialists plus the Coordinator**.
+  Each makes a concise relevant contribution or states there is nothing relevant.
+  The Coordinator evaluates evidence, preserves disagreement and gives feedback.
+  Explicitly scoped research jobs may use fewer but must not claim full coverage.
 - Ask each specialist which tools it needs. Its answer is a proposed development
   requirement, not a grant of access or evidence that the tool works.
 
@@ -172,7 +171,7 @@ Nutrition cases must cover physiology, interactions, genuine and misleading
 deficiency patterns, extraction errors and unit/reference-range variation.
 Finance cases must cover independently checked arithmetic, payment timing,
 changing official rules, different benefits/circumstances and missing inputs.
-Include peer disagreements, ten-bot cap enforcement and permission attacks.
+Include peer disagreements, eleven-specialist coverage, server limits and permission attacks.
 Repeat relevant evaluations after material changes. Engineering tests and a
 specialist's own assessment do not establish subject-matter competence.
 
@@ -193,3 +192,4 @@ individual suitability. Commercial gain must not determine suitability; if no
 suitable partner exists, explain that and help find alternatives without lowering
 standards. Recruitment and feedback services do not yet implement this matching,
 subscriber consent or introduction-tracking workflow.
+

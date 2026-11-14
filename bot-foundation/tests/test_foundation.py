@@ -160,7 +160,7 @@ class ProfileTests(unittest.TestCase):
                                model_processing=True, sensitive_enabled=True,
                                categories=["identity", "habits", "emotions"])
         self.revision = self.profile.set_consent("alice", self.consent)
-        self.messages = [Message(id="m1", conversation_id="c1", text="I enjoy gardening every weekend.")]
+        self.messages = [Message(id="m1", conversation_id="c1", text="I enjoy gardening every weekend.", categories=["habits"], sensitive=False)]
         self.proposal = ProfileProposal(observations=[Observation(
             category="habits", statement="Enjoys gardening at weekends.", kind="user_statement",
             sensitive=False, evidence=[Evidence(message_id="m1", quote="I enjoy gardening")])], follow_up=None)
@@ -219,7 +219,7 @@ class ProfileTests(unittest.TestCase):
         self.proposal.observations[0].kind = "observed_pattern"
         with self.assertRaises(ValueError):
             self.record()
-        self.messages.append(Message(id="m2", conversation_id="c2", text="I enjoy gardening again."))
+        self.messages.append(Message(id="m2", conversation_id="c2", text="I enjoy gardening again.", categories=["habits"], sensitive=False))
         self.proposal.observations[0].evidence.append(Evidence(message_id="m2", quote="I enjoy gardening"))
         self.assertTrue(self.record())
 
@@ -387,7 +387,7 @@ class ToolAndPartnerTests(unittest.TestCase):
 class BuilderTests(unittest.TestCase):
     def setUp(self):
         self.provider = DemoProvider()
-        self.builders = Builders(self.provider)
+        self.builders = Builders(self.provider, caller_role="chief-of-staff")
         self.meal = MealContext(goals="Everyday meals", preferences="Simple foods", allergies=[],
                                 budget_and_access="Modest budget", facilities_and_skills="A home kitchen",
                                 routine_and_activity="Variable work routine", restrictions="None reported",
@@ -427,7 +427,7 @@ class BuilderTests(unittest.TestCase):
                 return {"title": "Resume draft", "lines": [{"text": "Invented qualification", "fact_ids": ["not-supplied"]}],
                         "missing_information": []}
         with self.assertRaises(ValueError):
-            Builders(CareerProvider()).career_document("resume", self.career, model_processing_approved=True)
+            Builders(CareerProvider(), caller_role="chief-of-staff").career_document("resume", self.career, model_processing_approved=True)
 
     def test_resume_and_cover_letter_are_editable_referenced_drafts(self):
         class CareerProvider(DemoProvider):
@@ -435,7 +435,7 @@ class BuilderTests(unittest.TestCase):
                 return {"title": stage, "lines": [{"text": "Experience maintaining a home garden.", "fact_ids": ["fact-1"]}],
                         "missing_information": ["Confirm dates and contact details."]}
         for kind in ("resume", "cover_letter"):
-            result = Builders(CareerProvider()).career_document(kind, self.career, model_processing_approved=True)
+            result = Builders(CareerProvider(), caller_role="chief-of-staff").career_document(kind, self.career, model_processing_approved=True)
             self.assertEqual(result["state"], "draft_for_review")
             self.assertTrue(result["claim_entailment_requires_review"])
 
@@ -452,7 +452,7 @@ class BuilderTests(unittest.TestCase):
         context = BusinessContext(owner_facts=[WorkFact(id="private-fact", text=owner_text)],
                                   research_question="Demonstrate general market research workflow.",
                                   goals_and_constraints="Build a small service business.")
-        result = Builders(provider).business_plan(context, Team(provider), demo_sources(),
+        result = Builders(provider, caller_role="chief-of-staff").business_plan(context, Team(provider), demo_sources(),
                     model_processing_approved=True, research_question_approved=True)
         self.assertEqual(result["state"], "draft_for_review")
         specialist_calls = [c for c in provider.calls if c[0] in SPECIALIST_IDS]

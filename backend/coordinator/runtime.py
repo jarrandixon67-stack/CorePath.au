@@ -141,15 +141,30 @@ class Runtime:
         tasks, issues = [], []
         try:
             row = repo.check(caller, run_id, settings)
+            full_team_requested = (
+                len(request.allowed_domains) == MAX_SPECIALIST_CALLS
+                and row["max_calls"] == MAX_SPECIALIST_CALLS
+            )
             context = {
                 "question": request.question,
                 "allowed_specialists": [
                     bot for bot in catalogue() if bot["domain"] in request.allowed_domains
                 ],
                 "remaining_calls": row["max_calls"],
+                "required_initial_domains": (
+                    [domain.value for domain in request.allowed_domains]
+                    if full_team_requested
+                    else []
+                ),
             }
             plan = self.provider.plan(context)
             validate_assignments(plan.assignments, request.allowed_domains, row["max_calls"])
+            if (
+                full_team_requested
+                and plan.decision == "research"
+                and {a.domain for a in plan.assignments} != set(request.allowed_domains)
+            ):
+                raise InvalidEvidence("Full-team research requires all eleven initial assessments")
             repo.save_plan(caller, run_id, plan, settings)
             report = {
                 "audience": "personal_ai_internal",
@@ -161,6 +176,9 @@ class Runtime:
                 "call_budget": row["max_calls"],
                 "team_bot_limit": MAX_TEAM_BOTS,
                 "team_count_includes": "coordinator_and_dispatched_specialists",
+                "full_team_requested": full_team_requested,
+                "full_team_assessed": False,
+                "peer_review_round_executed": False,
                 "confidence_note": "Uncalibrated model judgement; citations establish traceability, not truth or entailment.",
             }
             if plan.decision == "clarify":
@@ -209,6 +227,11 @@ class Runtime:
                     tasks.append(task)
 
             dispatch(plan.assignments, "initial")
+            report["full_team_assessed"] = (
+                full_team_requested
+                and len(tasks) == MAX_SPECIALIST_CALLS
+                and all(task["result"] is not None for task in tasks)
+            )
             row = repo.check(caller, run_id, settings)
             used = {task["domain"] for task in tasks}
             requested = {

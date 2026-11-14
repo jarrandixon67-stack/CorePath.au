@@ -131,7 +131,11 @@ class BusinessDraft(Model):
 
 
 class Builders:
-    def __init__(self, provider: Provider):
+    def __init__(self, provider: Provider, *, caller_role: str):
+        # An internal coordinator facade, not a second subscriber entry point.
+        # The trusted application must authenticate this role before construction.
+        if caller_role != "chief-of-staff":
+            raise PermissionError("Draft builders must be dispatched through the Chief of Staff")
         self.provider = provider
 
     def meal_plan(self, context: MealContext, *, model_processing_approved: bool):
