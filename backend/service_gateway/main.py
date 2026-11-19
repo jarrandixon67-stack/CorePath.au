@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     percy_machine_token: str | None = None
     coordinator_machine_token: str | None = None
     allowed_member_subject: str | None = None
+    allowed_member_subjects: str | None = None
     percy_subject: str = "corepath-persy"
     coordinator_subject: str = "corepath-coordinator"
 
@@ -29,6 +30,20 @@ class Settings(BaseSettings):
 @lru_cache
 def settings():
     return Settings()
+
+
+def member_is_enabled(config: Settings, subject: str) -> bool:
+    """Temporary allowlist for the small pilot; authentication remains external."""
+    if config.allowed_member_subjects is not None:
+        allowed = [part.strip() for part in config.allowed_member_subjects.split(",")]
+        if not 1 <= len(allowed) <= 20:
+            return False
+        if any(not part or len(part) > 200 or part == "*" for part in allowed):
+            return False
+        if len(set(allowed)) != len(allowed):
+            return False
+        return subject in allowed
+    return bool(config.allowed_member_subject and subject == config.allowed_member_subject)
 
 
 class ResearchExchange(StrictModel):
@@ -124,7 +139,7 @@ def percy(body: ResearchExchange, authorization: str | None = Header(default=Non
         purpose="research_approval",
         domain="*",
     )
-    if not config.allowed_member_subject or member.subject != config.allowed_member_subject:
+    if not member_is_enabled(config, member.subject):
         raise HTTPException(403, "Member is not enabled for the live test")
     return mint(
         config,
