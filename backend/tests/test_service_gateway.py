@@ -154,3 +154,46 @@ def test_exchange_rejects_wrong_machine_scope_owner_and_arbitrary_claims(gateway
 def test_body_size_is_bounded(gateway):
     client, _, _ = gateway
     assert client.post("/exchange/percy", content="x" * 17000).status_code == 413
+
+
+def test_pilot_member_allowlist_requires_explicit_approval(gateway, monkeypatch):
+    client, member_key, _ = gateway
+    from service_gateway.main import settings
+
+    original = settings()
+    pilot = Settings(
+        **{
+            **original.model_dump(),
+            "allowed_member_subject": None,
+            "allowed_member_subjects": "test-member,second-member",
+        }
+    )
+    monkeypatch.setattr("service_gateway.main.settings", lambda: pilot)
+    headers = {"Authorization": "Bearer " + "p" * 40}
+    for subject, expected in (("test-member", 200), ("second-member", 200), ("other", 403)):
+        response = client.post(
+            "/exchange/percy",
+            headers=headers,
+            json={
+                "target": "coordinator",
+                "action": "research",
+                "request_id": str(uuid4()),
+                "member_capability": member_token(member_key, subject=subject),
+            },
+        )
+        assert response.status_code == expected
+
+
+def test_pilot_member_allowlist_fails_closed_on_bad_configuration():
+    from service_gateway.main import member_is_enabled
+
+    assert not member_is_enabled(Settings(allowed_member_subjects=""), "test-member")
+    assert not member_is_enabled(Settings(allowed_member_subjects="x,x"), "x")
+    assert not member_is_enabled(Settings(allowed_member_subjects="*"), "test-member")
+    assert not member_is_enabled(Settings(allowed_member_subjects="x,"), "x")
+    assert not member_is_enabled(
+        Settings(allowed_member_subjects=",".join(str(i) for i in range(21))), "1"
+    )
+    assert member_is_enabled(
+        Settings(allowed_member_subjects=",".join(str(i) for i in range(20))), "19"
+    )
