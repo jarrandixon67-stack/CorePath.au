@@ -35,7 +35,9 @@ def gateway(monkeypatch):
     return TestClient(app), member_key, service_key
 
 
-def member_token(key, *, subject="test-member", scope="persy:research"):
+def member_token(
+    key, *, subject="test-member", scope="persy:research", purpose="research_approval"
+):
     now = int(time.time())
     claims = {
         "iss": "corepath-member-gateway",
@@ -44,7 +46,7 @@ def member_token(key, *, subject="test-member", scope="persy:research"):
         "actor": "member",
         "domain": "*",
         "scope": [scope],
-        "purpose": "research_approval",
+        "purpose": purpose,
         "iat": now,
         "nbf": now,
         "exp": now + 120,
@@ -197,3 +199,119 @@ def test_pilot_member_allowlist_fails_closed_on_bad_configuration():
     assert member_is_enabled(
         Settings(allowed_member_subjects=",".join(str(i) for i in range(20))), "19"
     )
+
+
+PROFILE_ACTIONS = {
+    "context": ("persy:chat", "conversation_reply", "profile:context", "personalisation"),
+    "review": ("persy:profile:review", "profile_review", "profile:review", "owner_review"),
+    "consent": ("persy:profile:control", "profile_control", "profile:consent", "owner_control"),
+    "analyse": ("persy:profile:analyse", "profile_analysis", "profile:analyse", "profile_analysis"),
+    "decision": ("persy:profile:control", "profile_control", "profile:decide", "owner_control"),
+    "delete_item": ("persy:profile:control", "profile_control", "profile:delete", "owner_control"),
+    "delete_profile": ("persy:profile:control", "profile_control", "profile:delete", "owner_control"),
+}
+
+
+@pytest.mark.parametrize("action", list(PROFILE_ACTIONS))
+def test_life_profile_delegates_only_current_member_and_requested_action(
+    gateway, monkeypatch, action
+):
+    client, member_key, service_key = gateway
+    from service_gateway.main import settings
+
+    profile_key = Ed25519PrivateKey.generate()
+    original = settings()
+    config = Settings(
+        **{
+            **original.model_dump(),
+            "profile_signing_private_key": profile_key.private_bytes(
+                Encoding.PEM, PrivateFormat.PKCS8, NoEncryption()
+            ).decode(),
+        }
+    )
+    monkeypatch.setattr("service_gateway.main.settings", lambda: config)
+
+    incoming_scope, incoming_purpose, delegated_scope, delegated_purpose = PROFILE_ACTIONS[
+        action
+    ]
+    request_id = str(uuid4())
+    body = {
+        "target": "life_profile",
+        "action": action,
+        "request_id": request_id,
+        "member_capability": member_token(
+            member_key, scope=incoming_scope, purpose=incoming_purpose
+        ),
+    }
+    response = client.post(
+        "/exchange/percy", headers={"Authorization": "Bearer " + "p" * 40}, json=body
+    )
+    assert response.status_code == 200
+    token = response.json()["capability"]
+    claims = jwt.decode(
+        token,
+        profile_key.public_key(),
+        algorithms=["EdDSA"],
+        issuer="corepath-personal-ai",
+        audience="corepath-life-profile",
+    )
+    assert claims["sub"] == "test-member"
+    assert claims["actor"] == "personal_ai"
+    assert claims["scope"] == [delegated_scope]
+    assert claims["purpose"] == delegated_purpose
+    assert claims["jti"] == request_id
+    assert claims["domain"] == "*"
+    assert claims["exp"] <= int(time.time()) + 120
+    with pytest.raises(jwt.PyJWTError):
+        jwt.decode(
+            token,
+            service_key.public_key(),
+            algorithms=["EdDSA"],
+            audience="corepath-coordinator",
+        )
+
+    # Profile actions cannot be requested using a general research or wrong-person token.
+    for bad_token in (
+        member_token(member_key),
+        member_token(
+            member_key, scope=incoming_scope, purpose=incoming_purpose, subject="other-member"
+        ),
+    ):
+        denied = client.post(
+            "/exchange/percy",
+            headers={"Authorization": "Bearer " + "p" * 40},
+            json={**body, "member_capability": bad_token},
+        )
+        assert denied.status_code in (401, 403)
+
+
+def test_profile_delegation_fails_closed_without_separate_signing_key(gateway):
+    client, member_key, _ = gateway
+    response = client.post(
+        "/exchange/percy",
+        headers={"Authorization": "Bearer " + "p" * 40},
+        json={
+            "target": "life_profile",
+            "action": "review",
+            "request_id": str(uuid4()),
+            "member_capability": member_token(
+                member_key, scope="persy:profile:review", purpose="profile_review"
+            ),
+        },
+    )
+    assert response.status_code == 503
+
+
+def test_profile_delegation_rejects_administrative_claims(gateway):
+    client, member_key, _ = gateway
+    response = client.post(
+        "/exchange/percy",
+        headers={"Authorization": "Bearer " + "p" * 40},
+        json={
+            "target": "life_profile",
+            "action": "admin",
+            "request_id": str(uuid4()),
+            "member_capability": member_token(member_key),
+        },
+    )
+    assert response.status_code == 422
