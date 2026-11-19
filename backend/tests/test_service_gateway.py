@@ -202,13 +202,48 @@ def test_pilot_member_allowlist_fails_closed_on_bad_configuration():
 
 
 PROFILE_ACTIONS = {
-    "context": ("persy:chat", "conversation_reply", "profile:context", "personalisation"),
-    "review": ("persy:profile:review", "profile_review", "profile:review", "owner_review"),
-    "consent": ("persy:profile:control", "profile_control", "profile:consent", "owner_control"),
-    "analyse": ("persy:profile:analyse", "profile_analysis", "profile:analyse", "profile_analysis"),
-    "decision": ("persy:profile:control", "profile_control", "profile:decide", "owner_control"),
-    "delete_item": ("persy:profile:control", "profile_control", "profile:delete", "owner_control"),
-    "delete_profile": ("persy:profile:control", "profile_control", "profile:delete", "owner_control"),
+    "context": (
+        "persy:chat",
+        "conversation_reply",
+        "profile:context",
+        "personalisation",
+    ),
+    "review": (
+        "persy:profile:review",
+        "profile_review",
+        "profile:review",
+        "owner_review",
+    ),
+    "consent": (
+        "persy:profile:control",
+        "profile_control",
+        "profile:consent",
+        "owner_control",
+    ),
+    "analyse": (
+        "persy:profile:analyse",
+        "profile_analysis",
+        "profile:analyse",
+        "profile_analysis",
+    ),
+    "decision": (
+        "persy:profile:control",
+        "profile_control",
+        "profile:decide",
+        "owner_control",
+    ),
+    "delete_item": (
+        "persy:profile:control",
+        "profile_control",
+        "profile:delete",
+        "owner_control",
+    ),
+    "delete_profile": (
+        "persy:profile:control",
+        "profile_control",
+        "profile:delete",
+        "owner_control",
+    ),
 }
 
 
