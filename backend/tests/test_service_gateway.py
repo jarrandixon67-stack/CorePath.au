@@ -266,9 +266,7 @@ def test_life_profile_delegates_only_current_member_and_requested_action(
     )
     monkeypatch.setattr("service_gateway.main.settings", lambda: config)
 
-    incoming_scope, incoming_purpose, delegated_scope, delegated_purpose = PROFILE_ACTIONS[
-        action
-    ]
+    incoming_scope, incoming_purpose, delegated_scope, delegated_purpose = PROFILE_ACTIONS[action]
     request_id = str(uuid4())
     body = {
         "target": "life_profile",

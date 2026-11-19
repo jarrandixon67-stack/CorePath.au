@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - trial/20-member-allowlist-20261119
       - feature/knowledge-infrastructure-foundation
   pull_request:
     branches:

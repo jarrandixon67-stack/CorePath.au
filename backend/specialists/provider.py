@@ -4,6 +4,7 @@ from typing import Protocol
 import httpx
 from pydantic import ValidationError
 
+from app.trial_metrics import model_call
 from bot_standards import apply_standard
 from specialists.models import InvalidEvidence, Proposal, ProviderUnavailable, ToolNeeds
 from specialists.registry import Specialist
@@ -49,41 +50,48 @@ class OpenAIProvider:
         model = self.settings.model_for(specialist.domain)
         if not model or not self.settings.openai_api_key:
             raise ProviderUnavailable
-        try:
-            with httpx.Client(timeout=self.settings.model_timeout_seconds) as client:
-                response = client.post(
-                    "https://api.openai.com/v1/responses",
-                    headers={"Authorization": "Bearer " + self.settings.openai_api_key},
-                    json={
-                        "model": model,
-                        "instructions": instructions,
-                        "input": [{"role": "user", "content": json.dumps(context)}],
-                        "store": False,
-                        "max_output_tokens": self.settings.max_output_tokens,
-                        "text": {
-                            "format": {
-                                "type": "json_schema",
-                                "name": schema_name,
-                                "strict": True,
-                                "schema": contract.model_json_schema(),
-                            }
+        with model_call("specialist." + specialist.domain.value, "SPECIALISTS") as measurement:
+            try:
+                with httpx.Client(timeout=self.settings.model_timeout_seconds) as client:
+                    response = client.post(
+                        "https://api.openai.com/v1/responses",
+                        headers={"Authorization": "Bearer " + self.settings.openai_api_key},
+                        json={
+                            "model": model,
+                            "instructions": instructions,
+                            "input": [{"role": "user", "content": json.dumps(context)}],
+                            "store": False,
+                            "max_output_tokens": self.settings.max_output_tokens,
+                            "text": {
+                                "format": {
+                                    "type": "json_schema",
+                                    "name": schema_name,
+                                    "strict": True,
+                                    "schema": contract.model_json_schema(),
+                                }
+                            },
                         },
-                    },
+                    )
+                    response.raise_for_status()
+                    payload = response.json()
+                    if isinstance(payload, dict):
+                        measurement["usage"] = payload.get("usage")
+            except (httpx.HTTPError, ValueError) as exc:
+                raise ProviderUnavailable from exc
+            try:
+                if payload.get("status") != "completed":
+                    raise InvalidEvidence("The model response was incomplete.")
+                text = "".join(
+                    part["text"]
+                    for item in payload.get("output", [])
+                    if item.get("type") == "message"
+                    for part in item.get("content", [])
+                    if part.get("type") == "output_text"
                 )
-                response.raise_for_status()
-                payload = response.json()
-        except (httpx.HTTPError, ValueError) as exc:
-            raise ProviderUnavailable from exc
-        try:
-            if payload.get("status") != "completed":
-                raise InvalidEvidence("The model response was incomplete.")
-            text = "".join(
-                part["text"]
-                for item in payload.get("output", [])
-                if item.get("type") == "message"
-                for part in item.get("content", [])
-                if part.get("type") == "output_text"
-            )
-            return contract.model_validate_json(text)
-        except (ValidationError, KeyError, TypeError, AttributeError) as exc:
-            raise InvalidEvidence("The response did not match the specialist contract.") from exc
+                result = contract.model_validate_json(text)
+                measurement["valid"] = True
+                return result
+            except (ValidationError, KeyError, TypeError, AttributeError) as exc:
+                raise InvalidEvidence(
+                    "The response did not match the specialist contract."
+                ) from exc

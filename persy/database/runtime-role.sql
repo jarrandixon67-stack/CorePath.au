@@ -13,5 +13,6 @@ GRANT UPDATE (state, payload_ciphertext, error_code, completed_at)
     ON persy_operations TO corepath_persy_runtime;
 GRANT UPDATE (state, payload_ciphertext, approved_at) ON persy_research_proposals
     TO corepath_persy_runtime;
+GRANT EXECUTE ON FUNCTION persy_erase_account(character) TO corepath_persy_runtime;
 GRANT INSERT ON persy_audit TO corepath_persy_runtime;
 COMMIT;

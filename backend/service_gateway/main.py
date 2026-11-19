@@ -10,6 +10,7 @@ from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from fastapi import FastAPI, Header, HTTPException
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from app.trial_metrics import install_endpoint
 from specialists.models import StrictModel
 from specialists.registry import Domain
 from specialists.security import validate_capability
@@ -175,9 +176,7 @@ def mint(
     if not signing_key:
         raise HTTPException(503, "Exchange signing identity is not configured")
     try:
-        key = load_pem_private_key(
-            signing_key.replace("\\n", "\n").encode(), password=None
-        )
+        key = load_pem_private_key(signing_key.replace("\\n", "\n").encode(), password=None)
         if not isinstance(key, Ed25519PrivateKey):
             raise TypeError("Expected Ed25519")
     except (ValueError, TypeError) as exc:
@@ -277,3 +276,6 @@ def coordinator(body: DispatchExchange, authorization: str | None = Header(defau
         request_id=body.request_id,
         expires=int(time.time()) + 240,
     )
+
+
+install_endpoint(app, "exchange")

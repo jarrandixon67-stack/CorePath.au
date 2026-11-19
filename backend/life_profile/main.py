@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse
 from psycopg import Error as DatabaseError
 from psycopg_pool import ConnectionPool, PoolTimeout
 
+from app.trial_metrics import install_endpoint
 from life_profile.bot import LifeProfileBot
 from life_profile.journal import (
     EntryCreate,
@@ -285,3 +286,6 @@ def delete_journal_entry(
         raise HTTPException(422, "A positive current entry version is required")
     JournalStore(repo).delete(caller.subject, entry_id, expected_version, caller.request_id)
     return Response(status_code=204)
+
+
+install_endpoint(app, "life_profile")

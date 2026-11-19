@@ -407,3 +407,17 @@ class Repository:
                 .fetchall()
             )
             return [dict(row) for row in rows]
+
+    def delete_account(self, member, delete_profile):
+        key = self._owner(member)
+        with self.pool.connection() as conn:
+            self._lock(conn, key)
+            if conn.execute(
+                "SELECT 1 FROM persy_operations WHERE owner_key = %s AND state = 'running' AND lease_expires_at > now()",
+                (key,),
+            ).fetchone():
+                raise RunConflict
+            # The owner-scoped downstream DELETE is idempotent, so a retry can finish
+            # this transaction even if the profile deletion already committed.
+            delete_profile()
+            conn.execute("SELECT persy_erase_account(%s::character(64))", (key,))

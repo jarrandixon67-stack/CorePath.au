@@ -19,6 +19,7 @@ from persy.security import Member
 from persy.settings import Settings
 from persy.vault import Vault
 from specialists.models import (
+    AccessDenied,
     BudgetExceeded,
     InvalidEvidence,
     ProviderUnavailable,
@@ -103,7 +104,7 @@ def persy_store():
         try:
             conn.execute(sql.SQL("SET search_path TO {}").format(sql.Identifier(schema)))
             migrations = load_migrations(MIGRATIONS)
-            assert len(migrate(conn, migrations)) == 1
+            assert len(migrate(conn, migrations)) == 2
             assert migrate(conn, migrations) == []
             pool = ConnectionPool(
                 url,
@@ -493,6 +494,11 @@ def test_restricted_runtime_role_supports_consent_chat_and_erasure_without_other
             ).fetchone()[0]
             == 0
         )
+        private.delete_account(fresh(member), lambda: None)
+        with pytest.raises(AccessDenied):
+            private.privacy(member)
+        assert conn.execute("SELECT count(*) FROM persy_audit").fetchone()[0] == 0
+        assert conn.execute("SELECT count(*) FROM persy_nonces").fetchone()[0] == 0
         for forbidden in (
             "SELECT * FROM life_profiles",
             "SELECT * FROM knowledge_sources",

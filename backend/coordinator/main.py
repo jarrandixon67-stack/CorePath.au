@@ -7,6 +7,7 @@ from fastapi.responses import JSONResponse
 from psycopg import Error as DatabaseError
 from psycopg_pool import ConnectionPool, PoolTimeout
 
+from app.trial_metrics import activation, install_endpoint
 from coordinator.models import ResearchRequest
 from coordinator.provider import OpenAIProvider
 from coordinator.repository import Repository
@@ -113,7 +114,8 @@ def research(
     ],
     service: Annotated[Runtime, Depends(runtime)],
 ):
-    return service.execute(caller, request)
+    with activation("coordinator.research"):
+        return service.execute(caller, request)
 
 
 @app.get("/v1/coordinator/research/{run_id}")
@@ -128,3 +130,6 @@ def research_status(
     if result is None:
         raise HTTPException(404, "Coordinator run not found for this service")
     return result
+
+
+install_endpoint(app, "coordinator")
