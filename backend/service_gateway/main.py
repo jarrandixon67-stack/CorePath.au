@@ -57,8 +57,13 @@ class ResearchExchange(StrictModel):
 class ProfileExchange(StrictModel):
     target: Literal["life_profile"]
     action: Literal[
-        "context", "review", "consent", "analyse",
-        "decision", "delete_item", "delete_profile"
+        "context",
+        "review",
+        "consent",
+        "analyse",
+        "decision",
+        "delete_item",
+        "delete_profile",
     ]
     request_id: UUID
     member_capability: str
@@ -67,13 +72,48 @@ class ProfileExchange(StrictModel):
 # Scope and purpose on the incoming member token, followed by the narrowly
 # delegated Life Profile permission. Do not accept caller-supplied scopes.
 PROFILE_DELEGATIONS = {
-    "context": ("persy:chat", "conversation_reply", "profile:context", "personalisation"),
-    "review": ("persy:profile:review", "profile_review", "profile:review", "owner_review"),
-    "consent": ("persy:profile:control", "profile_control", "profile:consent", "owner_control"),
-    "analyse": ("persy:profile:analyse", "profile_analysis", "profile:analyse", "profile_analysis"),
-    "decision": ("persy:profile:control", "profile_control", "profile:decide", "owner_control"),
-    "delete_item": ("persy:profile:control", "profile_control", "profile:delete", "owner_control"),
-    "delete_profile": ("persy:profile:control", "profile_control", "profile:delete", "owner_control"),
+    "context": (
+        "persy:chat",
+        "conversation_reply",
+        "profile:context",
+        "personalisation",
+    ),
+    "review": (
+        "persy:profile:review",
+        "profile_review",
+        "profile:review",
+        "owner_review",
+    ),
+    "consent": (
+        "persy:profile:control",
+        "profile_control",
+        "profile:consent",
+        "owner_control",
+    ),
+    "analyse": (
+        "persy:profile:analyse",
+        "profile_analysis",
+        "profile:analyse",
+        "profile_analysis",
+    ),
+    "decision": (
+        "persy:profile:control",
+        "profile_control",
+        "profile:decide",
+        "owner_control",
+    ),
+    "delete_item": (
+        "persy:profile:control",
+        "profile_control",
+        "profile:delete",
+        "owner_control",
+    ),
+    "delete_profile": (
+        "persy:profile:control",
+        "profile_control",
+        "profile:delete",
+        "owner_control",
+    ),
 }
 
 
@@ -115,8 +155,18 @@ def machine(authorization, expected):
 
 
 def mint(
-    config, *, subject, actor, domain, scope, purpose, audience,
-    request_id, expires, issuer="corepath-service-gateway", signing_key=None,
+    config,
+    *,
+    subject,
+    actor,
+    domain,
+    scope,
+    purpose,
+    audience,
+    request_id,
+    expires,
+    issuer="corepath-service-gateway",
+    signing_key=None,
 ):
     now = int(time.time())
     if expires <= now:
@@ -154,13 +204,19 @@ def live():
 
 
 @app.post("/exchange/percy")
-def percy(body: ResearchExchange | ProfileExchange, authorization: str | None = Header(default=None)):
+def percy(
+    body: ResearchExchange | ProfileExchange,
+    authorization: str | None = Header(default=None),
+):
     config = settings()
     machine(authorization, config.percy_machine_token)
     if isinstance(body, ProfileExchange):
-        member_scope, member_purpose, profile_scope, profile_purpose = PROFILE_DELEGATIONS[
-            body.action
-        ]
+        (
+            member_scope,
+            member_purpose,
+            profile_scope,
+            profile_purpose,
+        ) = PROFILE_DELEGATIONS[body.action]
     else:
         member_scope, member_purpose = "persy:research", "research_approval"
     member = validate_capability(
