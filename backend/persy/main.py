@@ -1,14 +1,21 @@
+import os
+from concurrent.futures import ThreadPoolExecutor
 from contextlib import asynccontextmanager
+from time import perf_counter, time
 from typing import Annotated
 from uuid import UUID
 
+import httpx
 from cryptography.fernet import InvalidToken
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
-from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import FileResponse, JSONResponse
 from psycopg import Error as DatabaseError
 from psycopg_pool import ConnectionPool, PoolTimeout
 
+from app.trial_metrics import record, snapshot
 from life_profile.models import Consent, Decision
+from persy import trial
 from persy.membership import base_membership
 from persy.models import Approval, Message, Missing, PrivacyChange, PrivacyRequired, ProfileAnalysis
 from persy.provider import OpenAIProvider
@@ -67,9 +74,75 @@ app = FastAPI(
 
 @app.middleware("http")
 async def private_responses(request, call_next):
-    response = await call_next(request)
+    started = perf_counter()
+    try:
+        if request.method in ("POST", "PUT"):
+            total = 0
+            chunks = []
+            async for chunk in request.stream():
+                total += len(chunk)
+                if total > 32768:
+                    return JSONResponse(
+                        {"detail": "Request too large"},
+                        status_code=413,
+                        headers={"Cache-Control": "no-store"},
+                    )
+                chunks.append(chunk)
+            request._body = b"".join(chunks)
+        response = await call_next(request)
+    except Exception:  # noqa: BLE001 - never log potentially private exceptions
+        response = JSONResponse({"detail": "Percy is temporarily unavailable"}, status_code=500)
+    if request.url.path.startswith("/v1/persy/") and request.method in ("POST", "PUT", "DELETE"):
+        record("percy.write", perf_counter() - started, error=response.status_code >= 400)
     response.headers["Cache-Control"] = "no-store"
     response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["Referrer-Policy"] = "no-referrer"
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; "
+        "form-action 'self'"
+    )
+    return response
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_error(_request, _exc):
+    return JSONResponse({"detail": "Check the supplied fields and try again"}, status_code=422)
+
+
+@app.get("/")
+def trial_page():
+    return FileResponse(trial.ASSETS / "index.html")
+
+
+@app.get("/trial.js")
+def trial_script():
+    return FileResponse(trial.ASSETS / "trial.js", media_type="text/javascript")
+
+
+@app.get("/trial.css")
+def trial_style():
+    return FileResponse(trial.ASSETS / "trial.css", media_type="text/css")
+
+
+@app.post("/trial/session", status_code=204)
+def trial_login(request: Request, body: trial.Login):
+    subject = trial.login(request, body)
+    repo = repository(request)
+    repo.privacy(Member(subject, "", int(time()) + 60, ""))
+    token = trial.new_session(subject)
+    response = Response(status_code=204)
+    response.set_cookie(
+        trial.COOKIE, token, max_age=3600, secure=True, httponly=True, samesite="strict"
+    )
+    return response
+
+
+@app.delete("/trial/session", status_code=204)
+def trial_logout(request: Request):
+    trial.require_origin(request)
+    trial.end_session(request)
+    response = Response(status_code=204)
+    response.delete_cookie(trial.COOKIE, secure=True, httponly=True, samesite="strict")
     return response
 
 
@@ -179,6 +252,10 @@ def chat(
     member: Annotated[Member, Depends(member_capability("persy:chat", "conversation_reply"))],
     service: Service,
 ):
+    if trial.config().origin:
+        if message.specialist_mode != "auto":
+            raise HTTPException(422, "The trial uses automatic specialist selection")
+        message = message.model_copy(update={"max_specialists": min(message.max_specialists, 3)})
     return service.chat(member, conversation_id, message)
 
 
@@ -232,3 +309,48 @@ def delete_profile_item(item_id: UUID, member: ProfileControl, service: Service)
 def delete_profile(member: ProfileControl, service: Service):
     service.profile_action(member, "delete_profile")
     return Response(status_code=204)
+
+
+@app.delete("/trial/account", status_code=204)
+def trial_delete_account(request: Request, member: ProfileControl, repo: Repo):
+    trial.session_subject(request)
+    repo.delete_account(member, lambda: Services(get_settings()).profile(member, "delete_profile"))
+    return trial_logout(request)
+
+
+@app.get("/trial/flags")
+def trial_flags(request: Request):
+    return {"administrator": trial.session_subject(request) == trial.config().administrator}
+
+
+@app.get("/trial/metrics")
+def trial_metrics(request: Request, member: OwnerControl, repo: Repo):
+    if trial.session_subject(request) != trial.config().administrator:
+        raise HTTPException(403, "Trial administrator required")
+    repo.privacy(member)
+    settings = get_settings()
+    targets = {
+        "coordinator": settings.coordinator_url,
+        "specialists": trial.config().specialist_url,
+        "life_profile": settings.profile_url,
+    }
+    token = os.getenv("TRIAL_METRICS_TOKEN", "")
+
+    def fetch(target):
+        name, url = target
+        if url and len(token) >= 48:
+            try:
+                response = httpx.get(
+                    url.rstrip("/") + "/internal/trial-metrics",
+                    headers={"Authorization": "Bearer " + token},
+                    follow_redirects=False,
+                    timeout=3,
+                )
+                response.raise_for_status()
+                return name, response.json()
+            except (httpx.HTTPError, ValueError):
+                pass
+        return name, {"status": "unavailable"}
+
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        return {"percy": snapshot(), **dict(executor.map(fetch, targets.items()))}

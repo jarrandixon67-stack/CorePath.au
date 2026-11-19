@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CorePath member trial</title>
+  <link rel="stylesheet" href="/trial.css">
+  <script defer src="/trial.js"></script>
+</head>
+<body>
+<main>
+  <header><p>CorePath Community</p><h1>Ask Percy</h1></header>
+  <p id="status" role="status"></p>
+  <form id="login">
+    <h2>Member sign-in</h2>
+    <label>Trial username <input name="username" autocomplete="username" required maxlength="100"></label>
+    <label>Password <input name="password" type="password" autocomplete="current-password" required maxlength="256"></label>
+    <button>Sign in</button>
+  </form>
+  <section id="member" hidden>
+    <details>
+      <summary>Privacy preferences</summary>
+      <form id="privacy">
+        <label><input type="checkbox" name="model_processing_enabled"> I consent to OpenAI processing my messages to generate replies.</label>
+        <label><input type="checkbox" name="history_enabled"> Keep encrypted conversation history so I can revisit it and select messages for Life Profile analysis.</label>
+        <label><input type="checkbox" name="profile_context_enabled"> Let me choose to include approved Life Profile items in future replies.</label>
+        <button>Save preferences</button>
+      </form>
+    </details>
+    <section aria-label="Conversation">
+      <h2>Conversation</h2>
+      <label>Open a conversation <select id="conversations"></select></label>
+      <button id="new-chat">New conversation</button>
+      <button id="delete-chat" disabled>Delete conversation</button>
+      <div id="thread" role="log" aria-label="Messages"></div>
+      <form id="chat">
+        <label>Your message <textarea name="message" required maxlength="4000" rows="3"></textarea></label>
+        <label><input type="checkbox" name="profile"> Use approved Life Profile context for this reply</label>
+        <button>Send to Percy</button>
+      </form>
+    </section>
+    <details>
+      <summary>Life Profile</summary>
+      <form id="consent">
+        <p>Select the categories you consent to analyse. Turning on analysis and external processing allows OpenAI to process only the messages you select for that request.</p>
+        <fieldset><legend>Categories</legend><div id="categories"></div></fieldset>
+        <label><input type="checkbox" name="analysis_enabled"> Analyse selected messages</label>
+        <label><input type="checkbox" name="external_model_processing"> Allow OpenAI to process the selected messages</label>
+        <label><input type="checkbox" name="personalisation_enabled"> Allow Percy to use items I approve for sharing</label>
+        <label><input type="checkbox" name="sensitive_observations_enabled"> Allow sensitive observations within the selected categories</label>
+        <label>Purpose <input name="purpose" required minlength="3" maxlength="500"></label>
+        <button>Save Life Profile consent</button>
+      </form>
+      <button id="analyse">Analyse checked messages</button>
+      <button id="review">Refresh Life Profile</button>
+      <button id="delete-profile">Delete Life Profile</button>
+      <div id="profile-items"></div>
+    </details>
+    <details id="admin" hidden>
+      <summary>Trial monitoring</summary>
+      <button id="refresh-metrics">Refresh metrics</button>
+      <div id="metrics"></div>
+    </details>
+    <footer><button id="logout">Sign out</button> <button id="delete-account">Delete trial account</button></footer>
+  </section>
+</main>
+</body>
+</html>

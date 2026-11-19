@@ -1,10 +1,12 @@
-# Initial live test: Percy, coordinator, all eleven specialists and a trusted exchange.
-# No automatic production changes; database owners are never service runtime logins.
+# Apply only after trial and billing approval. Use dedicated resources and restricted runtime logins.
+previews:
+  generation: "off"
 services:
 - type: web
-  name: corepath-percy
+  name: corepath-trial-percy
+  branch: trial/20-member-allowlist-20261119
   runtime: docker
-  plan: starter
+  plan: 0.5c-512mb
   region: singapore
   dockerfilePath: ./deployment/Dockerfile
   dockerContext: .
@@ -12,6 +14,32 @@ services:
   healthCheckPath: /health/live
   autoDeployTrigger: 'off'
   envVars:
+  - key: TRIAL_ORIGIN
+    sync: false
+  - key: TRIAL_ACCOUNTS
+    sync: false
+  - key: TRIAL_MEMBER_SIGNING_KEY
+    sync: false
+  - key: TRIAL_ADMINISTRATOR
+    sync: false
+  - key: TRIAL_SPECIALIST_URL
+    sync: false
+  - key: TRIAL_METRICS_TOKEN
+    sync: false
+  - key: TRIAL_PERCY_USD_PER_MILLION
+    sync: false
+  - key: PERSY_PROFILE_URL
+    sync: false
+  - key: PERSY_PROFILE_PUBLIC_KEY
+    sync: false
+  - key: PERSY_SERVICE_TIMEOUT_SECONDS
+    value: "180"
+  - key: PERSY_MAX_OPERATIONS_PER_24H
+    value: "12"
+  - key: PERSY_MAX_OUTPUT_TOKENS
+    value: "1200"
+  - key: PGSSLMODE
+    value: require
   - key: PERSY_DATABASE_URL
     sync: false
   - key: PERSY_ENCRYPTION_KEY
@@ -31,9 +59,10 @@ services:
   - key: PERSY_OPENAI_API_KEY
     sync: false
 - type: web
-  name: corepath-coordinator
+  name: corepath-trial-coordinator
+  branch: trial/20-member-allowlist-20261119
   runtime: docker
-  plan: starter
+  plan: 0.5c-512mb
   region: singapore
   dockerfilePath: ./deployment/Dockerfile
   dockerContext: .
@@ -42,6 +71,18 @@ services:
   healthCheckPath: /health/live
   autoDeployTrigger: 'off'
   envVars:
+  - key: TRIAL_METRICS_TOKEN
+    sync: false
+  - key: TRIAL_COORDINATOR_USD_PER_MILLION
+    sync: false
+  - key: COORDINATOR_MAX_SPECIALIST_CALLS
+    value: "3"
+  - key: COORDINATOR_MAX_DURATION_SECONDS
+    value: "150"
+  - key: COORDINATOR_MAX_RUNS_PER_24H
+    value: "40"
+  - key: PGSSLMODE
+    value: require
   - key: COORDINATOR_DATABASE_URL
     sync: false
   - key: COORDINATOR_GATEWAY_PUBLIC_KEY
@@ -59,9 +100,10 @@ services:
   - key: COORDINATOR_OPENAI_API_KEY
     sync: false
 - type: web
-  name: corepath-specialists
+  name: corepath-trial-specialists
+  branch: trial/20-member-allowlist-20261119
   runtime: docker
-  plan: starter
+  plan: 0.5c-512mb
   region: singapore
   dockerfilePath: ./deployment/Dockerfile
   dockerContext: .
@@ -70,6 +112,12 @@ services:
   healthCheckPath: /health/live
   autoDeployTrigger: 'off'
   envVars:
+  - key: TRIAL_METRICS_TOKEN
+    sync: false
+  - key: TRIAL_SPECIALISTS_USD_PER_MILLION
+    sync: false
+  - key: PGSSLMODE
+    value: require
   - key: SPECIALISTS_DATABASE_URL
     sync: false
   - key: SPECIALISTS_GATEWAY_PUBLIC_KEY
@@ -79,9 +127,10 @@ services:
   - key: SPECIALISTS_OPENAI_API_KEY
     sync: false
 - type: web
-  name: corepath-exchange
+  name: corepath-trial-exchange
+  branch: trial/20-member-allowlist-20261119
   runtime: docker
-  plan: starter
+  plan: 0.5c-512mb
   region: singapore
   dockerfilePath: ./deployment/Dockerfile
   dockerContext: .
@@ -90,6 +139,8 @@ services:
   healthCheckPath: /health/live
   autoDeployTrigger: 'off'
   envVars:
+  - key: EXCHANGE_PROFILE_SIGNING_PRIVATE_KEY
+    sync: false
   - key: EXCHANGE_SIGNING_PRIVATE_KEY
     sync: false
   - key: EXCHANGE_MEMBER_PUBLIC_KEY
@@ -98,18 +149,55 @@ services:
     sync: false
   - key: EXCHANGE_COORDINATOR_MACHINE_TOKEN
     sync: false
-  - key: EXCHANGE_ALLOWED_MEMBER_SUBJECT
+  - key: EXCHANGE_ALLOWED_MEMBER_SUBJECTS
+    sync: false
+- type: web
+  name: corepath-trial-profile
+  branch: trial/20-member-allowlist-20261119
+  runtime: docker
+  plan: 0.5c-512mb
+  region: singapore
+  dockerfilePath: ./deployment/Dockerfile
+  dockerContext: .
+  dockerCommand: sh -c 'uvicorn life_profile.main:app --host 0.0.0.0 --port "$PORT" --no-access-log'
+  healthCheckPath: /health/live
+  autoDeployTrigger: 'off'
+  envVars:
+  - key: PGSSLMODE
+    value: require
+  - key: LIFE_PROFILE_DATABASE_URL
+    sync: false
+  - key: LIFE_PROFILE_ENCRYPTION_KEY
+    sync: false
+  - key: LIFE_PROFILE_GATEWAY_PUBLIC_KEY
+    sync: false
+  - key: LIFE_PROFILE_MODEL
+    sync: false
+  - key: LIFE_PROFILE_OPENAI_API_KEY
+    sync: false
+  - key: TRIAL_METRICS_TOKEN
+    sync: false
+  - key: TRIAL_PROFILE_USD_PER_MILLION
     sync: false
 databases:
-- name: corepath-knowledge
-  plan: basic-256mb
+- name: corepath-trial-knowledge
+  plan: 0.1c-256mb
+  diskSizeGB: 1
   region: singapore
   databaseName: corepath_knowledge
   postgresMajorVersion: '16'
   ipAllowList: []
-- name: corepath-conversations
-  plan: basic-256mb
+- name: corepath-trial-conversations
+  plan: 0.1c-256mb
+  diskSizeGB: 1
   region: singapore
   databaseName: corepath_conversations
+  postgresMajorVersion: '16'
+  ipAllowList: []
+- name: corepath-trial-profile
+  plan: 0.1c-256mb
+  diskSizeGB: 1
+  region: singapore
+  databaseName: corepath_profiles
   postgresMajorVersion: '16'
   ipAllowList: []

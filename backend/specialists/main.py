@@ -7,6 +7,7 @@ from fastapi.responses import JSONResponse
 from psycopg import Error as DatabaseError
 from psycopg_pool import ConnectionPool, PoolTimeout
 
+from app.trial_metrics import activation, install_endpoint
 from specialists.models import (
     AccessDenied,
     BudgetExceeded,
@@ -162,7 +163,8 @@ def dispatch(
     ],
     service: Runtime = Depends(runtime),  # noqa: B008
 ):
-    return service.execute(caller, domain, task)
+    with activation("specialist.dispatch." + domain.value):
+        return service.execute(caller, domain, task)
 
 
 @app.post("/v1/specialists/{domain}/research")
@@ -207,3 +209,6 @@ def research_status(
     if result is None:
         raise HTTPException(404, "Specialist run not found for this service and discipline")
     return result
+
+
+install_endpoint(app, "specialists")

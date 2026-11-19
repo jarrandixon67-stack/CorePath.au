@@ -68,7 +68,7 @@ Repository commits and passing tests do not establish production deployment or r
 
 ## Render live-test deployment
 
-See [the deployment instructions](deployment/README.md) and `render.yaml` for the initial Percy → Coordinator → eleven-specialist chain. The new `service_gateway` package implements the limited research/dispatch token exchange required by those existing services. It does not enable profile access or deploy resources automatically. Hosting approval, restricted database provisioning, secret configuration, model access and live evaluation are still required.
+See [the trial launch instructions](deployment/README.md) and `render.yaml` for the 20-member pilot. The trial branch includes a browser chat, invitation sign-in, reviewed specialist research, owner-controlled Life Profile and aggregate administrator monitoring. Hosting approval, restricted database provisioning, secret configuration, approved source excerpts and live-model evaluation are required before inviting members.
 
 ## Business partner assessment and invitations
 

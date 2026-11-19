@@ -1,10 +1,11 @@
 from dataclasses import dataclass, field
 from typing import Annotated
 
-from fastapi import Depends
+from fastapi import Depends, HTTPException, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from persy.settings import Settings, get_settings
+from persy.trial import browser_capability, config
 from specialists.security import validate_capability
 
 bearer = HTTPBearer(auto_error=False)
@@ -20,10 +21,16 @@ class Member:
 
 def member_capability(scope, purpose):
     def dependency(
+        request: Request,
         credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer)],
         settings: Annotated[Settings, Depends(get_settings)],
     ):
-        token = credentials.credentials if credentials else None
+        if config().origin:
+            if credentials:
+                raise HTTPException(401, "Sign in to the trial")
+            token = browser_capability(request, scope, purpose)
+        else:
+            token = credentials.credentials if credentials else None
         caller = validate_capability(
             token,
             public_key=settings.gateway_public_key,

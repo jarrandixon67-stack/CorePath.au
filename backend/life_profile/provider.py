@@ -4,6 +4,7 @@ from typing import Protocol
 import httpx
 from pydantic import ValidationError
 
+from app.trial_metrics import model_call
 from bot_standards import apply_standard
 from life_profile.models import Proposal
 from life_profile.settings import Settings
@@ -67,43 +68,50 @@ class OpenAIProvider:
     def propose(self, context: dict) -> Proposal:
         if not self.settings.openai_api_key or not self.settings.model:
             raise ProviderUnavailable("The Life Profile model connection is not configured.")
-        try:
-            with httpx.Client(timeout=self.settings.model_timeout_seconds) as client:
-                response = client.post(
-                    "https://api.openai.com/v1/responses",
-                    headers={"Authorization": "Bearer " + self.settings.openai_api_key},
-                    json={
-                        "model": self.settings.model,
-                        "instructions": INSTRUCTIONS,
-                        "input": [{"role": "user", "content": json.dumps(context)}],
-                        "store": False,
-                        "max_output_tokens": 2400,
-                        "text": {
-                            "format": {
-                                "type": "json_schema",
-                                "name": "life_profile_proposals",
-                                "strict": True,
-                                "schema": Proposal.model_json_schema(),
-                            }
+        with model_call("life_profile.model", "PROFILE") as measurement:
+            try:
+                with httpx.Client(timeout=self.settings.model_timeout_seconds) as client:
+                    response = client.post(
+                        "https://api.openai.com/v1/responses",
+                        headers={"Authorization": "Bearer " + self.settings.openai_api_key},
+                        json={
+                            "model": self.settings.model,
+                            "instructions": INSTRUCTIONS,
+                            "input": [{"role": "user", "content": json.dumps(context)}],
+                            "store": False,
+                            "max_output_tokens": 2400,
+                            "text": {
+                                "format": {
+                                    "type": "json_schema",
+                                    "name": "life_profile_proposals",
+                                    "strict": True,
+                                    "schema": Proposal.model_json_schema(),
+                                }
+                            },
                         },
-                    },
+                    )
+                    response.raise_for_status()
+                    payload = response.json()
+                    if isinstance(payload, dict):
+                        measurement["usage"] = payload.get("usage")
+            except (httpx.HTTPError, ValueError) as exc:
+                raise ProviderUnavailable(
+                    "The model connection is unavailable; nothing was saved."
+                ) from exc
+            try:
+                if payload.get("status") != "completed":
+                    raise InvalidProposal("The model response was incomplete.")
+                text = "".join(
+                    part["text"]
+                    for item in payload.get("output", [])
+                    if item.get("type") == "message"
+                    for part in item.get("content", [])
+                    if part.get("type") == "output_text"
                 )
-                response.raise_for_status()
-                payload = response.json()
-        except (httpx.HTTPError, ValueError) as exc:
-            raise ProviderUnavailable(
-                "The model connection is unavailable; nothing was saved."
-            ) from exc
-        try:
-            if payload.get("status") != "completed":
-                raise InvalidProposal("The model response was incomplete.")
-            text = "".join(
-                part["text"]
-                for item in payload.get("output", [])
-                if item.get("type") == "message"
-                for part in item.get("content", [])
-                if part.get("type") == "output_text"
-            )
-            return Proposal.model_validate_json(text)
-        except (ValidationError, KeyError, TypeError, AttributeError) as exc:
-            raise InvalidProposal("The model response did not match the profile contract.") from exc
+                result = Proposal.model_validate_json(text)
+                measurement["valid"] = True
+                return result
+            except (ValidationError, KeyError, TypeError, AttributeError) as exc:
+                raise InvalidProposal(
+                    "The model response did not match the profile contract."
+                ) from exc
