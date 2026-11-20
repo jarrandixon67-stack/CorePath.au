@@ -15,9 +15,10 @@ async function api(path, method = "GET", body) {
     headers: body === undefined ? {} : {"Content-Type": "application/json"},
     body: body === undefined ? undefined : JSON.stringify(body)
   });
-  const result = response.status === 204 ? null : await response.json();
+  const isJson = response.headers.get("content-type")?.includes("application/json");
+  const result = isJson ? await response.json() : null;
   if (!response.ok) {
-    const error = new Error(typeof result.detail === "string" ? result.detail : "Request failed.");
+    const error = new Error(typeof result?.detail === "string" ? result.detail : "The service could not complete the request.");
     error.status = response.status;
     throw error;
   }
@@ -48,6 +49,13 @@ function signedOut() {
   for (const id of ["login", "chat", "privacy", "consent"]) byId(id).reset();
   byId("member").hidden = true;
   byId("login").hidden = false;
+  setChatConsent(false);
+}
+
+function setChatConsent(enabled) {
+  byId("send-chat").disabled = !enabled;
+  byId("chat-consent").hidden = enabled;
+  if (!enabled) byId("privacy-panel").open = true;
 }
 
 function append(parent, tag, text) {
@@ -143,6 +151,7 @@ async function enter() {
   for (const [key, value] of Object.entries(state.privacy)) {
     if (privacy.elements[key]) privacy.elements[key].checked = value;
   }
+  setChatConsent(state.privacy.model_processing_enabled);
   if (state.revision) await refreshConversations();
   byId("login").hidden = true;
   byId("member").hidden = false;
@@ -167,6 +176,7 @@ privacy.onsubmit = event => {
     for (const input of privacy.querySelectorAll("input")) body[input.name] = input.checked;
     const state = await api(base + "/privacy", "PUT", body);
     revision = state.revision;
+    setChatConsent(state.privacy.model_processing_enabled);
     if (!body.history_enabled) thread.replaceChildren();
     return "Privacy preferences saved.";
   });
@@ -185,6 +195,7 @@ byId("delete-chat").onclick = () => run(async () => {
 });
 byId("chat").onsubmit = event => {
   event.preventDefault();
+  if (byId("send-chat").disabled) return;
   run(async () => {
     const form = event.target;
     if (!active) {

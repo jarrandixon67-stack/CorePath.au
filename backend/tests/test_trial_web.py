@@ -17,6 +17,7 @@ from test_specialists_repository import specialist_store as specialist_fixture
 
 from app.trial_metrics import model_call, snapshot
 from coordinator import main as coordinator_api
+from coordinator.evaluate import load_cases
 from coordinator.runtime import Runtime as CoordinatorRuntime
 from coordinator.transport import HTTPSpecialistClient
 from life_profile import main as profile_api
@@ -28,7 +29,6 @@ from persy.services import Services
 from persy.settings import Settings, get_settings
 from service_gateway import main as exchange
 from specialists import main as specialist_api
-from specialists.registry import Domain
 from specialists.runtime import Runtime as SpecialistRuntime
 from specialists.settings import Settings as SpecialistSettings
 
@@ -88,6 +88,8 @@ def test_trial_browser_sign_in_chat_isolation_and_logout(browser):
     conversations = "/v1/persy/conversations"
     page = client.get("/")
     assert page.status_code == 200 and "Ask Percy" in page.text
+    assert '<form id="login" method="post" action="/trial/session">' in page.text
+    assert '<button id="send-chat" disabled>' in page.text
     assert "frame-ancestors 'none'" in page.headers["content-security-policy"]
     assert client.get("/trial.js").status_code == 200
     assert client.get(privacy).status_code == 401
@@ -164,16 +166,38 @@ def test_trial_roster_and_sign_in_rate_cap(browser):
     assert login(client, "member-0").status_code == 503
 
 
+@pytest.mark.parametrize(
+    "case",
+    [
+        case
+        for case in load_cases()
+        if len(case.required_domains) == 1 and case.id != "injection-in-question"
+    ],
+    ids=lambda case: case.id,
+)
 def test_trial_routes_a_reviewed_question_through_the_signed_service_chain(
-    browser, persy_store, coordinator_store, profiles, monkeypatch
+    browser, persy_store, coordinator_store, profiles, monkeypatch, case
 ):
     client, owner, browser_settings = browser
     personal_repo, _, _, _, personal_settings = persy_store
     coord_repo, specialist_repo, libraries, conn, caller, coord_settings = coordinator_store
     profile_repo, _, _, _, consent = profiles
-    domain = Domain.LEARNING
+    (domain,) = case.required_domains
     evidence(conn, libraries[domain.value])
-    coord_model = CoordinatorProvider([domain])
+
+    class PercyModel(Model):
+        def reply(self, context):
+            assert context["member_message"] == case.question
+            reply = super().reply(context)
+            reply.research_proposal.question = case.question
+            return reply
+
+    class RoutingModel(CoordinatorProvider):
+        def plan(self, context):
+            assert context["question"] == case.question
+            return super().plan(context)
+
+    coord_model = RoutingModel([domain])
     service_key, service_public = keys()
     service_private = service_key.private_bytes(
         serialization.Encoding.PEM,
@@ -234,7 +258,7 @@ def test_trial_routes_a_reviewed_question_through_the_signed_service_chain(
         coord_repo, coord_model, HTTPSpecialistClient(coord_settings), coord_settings
     )
     app.dependency_overrides[runtime] = lambda: Runtime(
-        personal_repo, Model(research=True), Services(personal_settings), personal_settings
+        personal_repo, PercyModel(research=True), Services(personal_settings), personal_settings
     )
     profile_api.app.dependency_overrides[profile_api.get_settings] = lambda: ProfileSettings(
         gateway_public_key=profile_public
@@ -270,9 +294,10 @@ def test_trial_routes_a_reviewed_question_through_the_signed_service_chain(
         chat = client.post(
             path + "/messages",
             headers=HEADERS,
-            json={"message": "Please research how spacing practice works", "max_specialists": 3},
+            json={"message": case.question, "max_specialists": 3},
         )
         assert chat.status_code == 200
+        assert chat.json()["message"] == "Let's choose one manageable next step."
         assert calls == []
         proposed = chat.json()["research_proposal"]
         result = client.post(
